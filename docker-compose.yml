@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  mocka-frontend:
+    build: mocka-frontend/
+    ports:
+      - "80:80"
+  mocka-backend:
+    build: mocka-backend/
+    depends_on:
+      - minio
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    ports:
+      - "9001:9001"
+    volumes:
+      - "/var/mnt/data:/data"
