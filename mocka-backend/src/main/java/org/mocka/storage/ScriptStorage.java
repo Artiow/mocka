@@ -25,13 +25,7 @@ public class ScriptStorage {
     @PostConstruct
     private void init() {
         try {
-            if (minioClient.bucketExists(BucketExistsArgs.builder().bucket(BUCKET).build())) {
-                log.debug(String.format("Bucket \"%s\" is ready", BUCKET));
-            } else {
-                log.warn(String.format("Bucket \"%s\" does not exist! Trying to create...", BUCKET));
-                minioClient.makeBucket(MakeBucketArgs.builder().bucket(BUCKET).build());
-                log.info(String.format("Bucket \"%s\" has been created", BUCKET));
-            }
+            verifyBucket();
         } catch (Exception e) {
             log.error("Failed to connect to minio", e);
         }
@@ -44,6 +38,7 @@ public class ScriptStorage {
     }
 
     public InputStream getScript(String name) throws ScriptStorageException {
+        verifyBucket();
         try {
             return minioClient.getObject(
                     GetObjectArgs
@@ -64,6 +59,7 @@ public class ScriptStorage {
     }
 
     public void putScript(InputStream stream, String name) throws ScriptStorageException {
+        verifyBucket();
         try {
             minioClient.putObject(
                     PutObjectArgs
@@ -75,6 +71,21 @@ public class ScriptStorage {
             );
         } catch (Exception e) {
             throw new ScriptStorageException(String.format("Exception occurred while script \"%s\" putting", name), e);
+        }
+    }
+
+
+    private void verifyBucket() throws ScriptStorageException {
+        try {
+            if (minioClient.bucketExists(BucketExistsArgs.builder().bucket(BUCKET).build())) {
+                log.trace(String.format("Bucket \"%s\" is ready", BUCKET));
+            } else {
+                log.warn(String.format("Bucket \"%s\" does not exist! Trying to create...", BUCKET));
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(BUCKET).build());
+                log.info(String.format("Bucket \"%s\" has been created", BUCKET));
+            }
+        } catch (Exception e) {
+            throw new ScriptStorageException("Failed to connect to minio", e);
         }
     }
 }
