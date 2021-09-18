@@ -1,5 +1,14 @@
-spring.application.name: mocka-backend
-server.port: 8080
+spring:
+  application.name: mocka-backend
+  main.banner-mode: "off"
+
+server:
+  port: 8080
+
+api-info:
+  title: Mocka API
+  description: The RESTful API mocking service. User API documentation.
+  version: @project.version@
 
 minio:
   endpoint: http://minio:9000

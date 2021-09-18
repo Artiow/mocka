@@ -1,10 +1,12 @@
 package org.mocka.controller;
 
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.mocka.service.ScriptService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Api(tags = "Mock management")
 @RestController
 @RequiredArgsConstructor
 public class ScriptController {
@@ -17,12 +19,12 @@ public class ScriptController {
         return ResponseEntity.noContent().build(); // todo
     }
 
-    @PostMapping(value = "/method", consumes = {"application/json"})
+    @PostMapping(value = "/method", consumes = "application/json")
     public ResponseEntity<Void> create(@RequestBody Object payload) {
         return ResponseEntity.noContent().build(); // todo
     }
 
-    @PutMapping(value = "/method/{id}", consumes = {"application/json"})
+    @PutMapping(value = "/method/{id}", consumes = "application/json")
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody Object payload) {
         return ResponseEntity.noContent().build(); // todo
     }
@@ -33,7 +35,7 @@ public class ScriptController {
     }
 
 
-    @GetMapping(value = "/method/{id}/script", produces = {"application/javascript", "application/ecmascript", "text/javascript", "text/ecmascript"})
+    @GetMapping(value = "/method/{id}/script", produces = "text/javascript")
     public ResponseEntity<String> getScript(@PathVariable Integer id) {
         var script = service.getScript(id);
         return ResponseEntity.ok(script);
@@ -46,7 +48,7 @@ public class ScriptController {
     }
 
 
-    @GetMapping(value = "/script/sample", produces = {"application/javascript", "application/ecmascript", "text/javascript", "text/ecmascript"})
+    @GetMapping(value = "/script/sample", produces = "text/javascript")
     public ResponseEntity<String> getSample() {
         var sample = service.getSample();
         return ResponseEntity.ok(sample);
