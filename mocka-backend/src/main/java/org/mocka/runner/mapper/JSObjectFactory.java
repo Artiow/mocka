@@ -1,4 +1,4 @@
-package org.mocka.runner;
+package org.mocka.runner.mapper;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
