@@ -1,6 +1,6 @@
 spring:
   application.name: mocka-backend
-  main.banner-mode: "off"
+  main.banner-mode: off
 
 server:
   port: 8080

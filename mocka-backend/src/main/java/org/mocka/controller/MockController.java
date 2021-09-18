@@ -2,16 +2,16 @@ package org.mocka.controller;
 
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
-import org.mocka.service.ScriptService;
+import org.mocka.service.MockService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Api(tags = "Mock management")
 @RestController
 @RequiredArgsConstructor
-public class ScriptController {
+public class MockController {
 
-    private final ScriptService service;
+    private final MockService service;
 
 
     @GetMapping(value = "/method/{id}")

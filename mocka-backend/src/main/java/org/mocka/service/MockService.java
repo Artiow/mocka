@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ScriptService {
+public class MockService {
 
     private final ScriptStorage storage;
     private final ScriptEngine engine;
