@@ -12,7 +12,7 @@
 
     <groupId>org.mocka</groupId>
     <artifactId>mocka-backend</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1.0</version>
     <name>mocka-backend</name>
 
     <properties>
