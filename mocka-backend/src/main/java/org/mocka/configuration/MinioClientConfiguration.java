@@ -1,26 +1,25 @@
 package org.mocka.configuration;
 
 import io.minio.MinioClient;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import org.mocka.properties.MinioProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
+@EnableConfigurationProperties(MinioProperties.class)
 public class MinioClientConfiguration {
 
-    @Value("${minio.endpoint}")
-    private String endpoint;
-    @Value("${minio.credentials.accessKey}")
-    private String accessKey;
-    @Value("${minio.credentials.secretKey}")
-    private String secretKey;
+    private final MinioProperties minio;
 
     @Bean
     public MinioClient minioClient() {
         return MinioClient
                 .builder()
-                .endpoint(endpoint)
-                .credentials(accessKey, secretKey)
+                .endpoint(minio.getEndpoint())
+                .credentials(minio.getCredentials().getAccessKey(), minio.getCredentials().getSecretKey())
                 .build();
     }
 }
