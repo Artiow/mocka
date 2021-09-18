@@ -1,7 +1,7 @@
 package org.mocka.controller;
 
-import org.mocka.service.ScriptService;
 import lombok.RequiredArgsConstructor;
+import org.mocka.service.ScriptService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,14 +33,22 @@ public class ScriptController {
     }
 
 
-    @GetMapping(value = "/method/{id}/script")
-    public ResponseEntity<Void> getScript(@PathVariable Integer id) {
-        return ResponseEntity.noContent().build(); // todo
+    @GetMapping(value = "/method/{id}/script", produces = {"application/javascript", "application/ecmascript", "text/javascript", "text/ecmascript"})
+    public ResponseEntity<String> getScript(@PathVariable Integer id) {
+        var script = service.getScript(id);
+        return ResponseEntity.ok(script);
     }
 
     @PutMapping(value = "/method/{id}/script", consumes = {"application/javascript", "application/ecmascript", "text/javascript", "text/ecmascript"})
-    public ResponseEntity<Void> upload(@PathVariable Integer id, @RequestBody String script) {
-        service.upload(id, script);
+    public ResponseEntity<Void> uploadScript(@PathVariable Integer id, @RequestBody String script) {
+        service.uploadScript(id, script);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping(value = "/script/sample", produces = {"application/javascript", "application/ecmascript", "text/javascript", "text/ecmascript"})
+    public ResponseEntity<String> getSample() {
+        var sample = service.getSample();
+        return ResponseEntity.ok(sample);
     }
 }
