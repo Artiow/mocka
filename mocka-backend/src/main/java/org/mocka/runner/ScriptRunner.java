@@ -1,8 +1,8 @@
 package org.mocka.runner;
 
-import org.mocka.storage.ScriptStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mocka.storage.ScriptStorage;
 import org.springframework.stereotype.Service;
 
 import javax.script.Invocable;
@@ -23,11 +23,10 @@ public class ScriptRunner {
 
     public synchronized Object invoke(Object arg) throws ScriptRunnerException {
         try {
-            var jsArg = mapper.map(arg);
             try (var reader = new InputStreamReader(storage.getScript())) {
                 engine.eval(reader);
             }
-            return ((Invocable) engine).invokeFunction(ENTRYPOINT, jsArg);
+            return ((Invocable) engine).invokeFunction(ENTRYPOINT, mapper.map(arg));
         } catch (Exception e) {
             throw new ScriptRunnerException("Exception occurred while script running", e);
         }

@@ -78,7 +78,7 @@ public class ScriptStorage {
     private void verifyBucket() throws ScriptStorageException {
         try {
             if (minioClient.bucketExists(BucketExistsArgs.builder().bucket(BUCKET).build())) {
-                log.trace(String.format("Bucket \"%s\" is ready", BUCKET));
+                log.debug(String.format("Bucket \"%s\" is ready", BUCKET));
             } else {
                 log.warn(String.format("Bucket \"%s\" does not exist! Trying to create...", BUCKET));
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(BUCKET).build());

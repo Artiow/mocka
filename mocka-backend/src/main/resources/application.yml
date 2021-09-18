@@ -11,4 +11,4 @@ logging:
   level:
     root: INFO
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
-    org.mocka: TRACE
+    org.mocka: DEBUG
