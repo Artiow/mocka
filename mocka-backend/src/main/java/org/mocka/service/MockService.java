@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.mocka.storage.ScriptStorage;
+import org.mocka.util.ResourceFileUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
 import javax.script.ScriptEngine;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
@@ -22,7 +21,7 @@ public class MockService {
 
 
     public String getSample() {
-        try (var scriptStream = new FileInputStream(ResourceUtils.getFile("classpath:sample.js"))) {
+        try (var scriptStream = ResourceFileUtils.open("classpath:sample.js")) {
             return IOUtils.toString(scriptStream, StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
