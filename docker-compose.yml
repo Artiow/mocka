@@ -19,3 +19,5 @@ services:
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD-password}
     ports:
       - "9001:9001"
+    volumes:
+      - "${MINIO_STORAGE_DIR-/mnt/data}:/data"

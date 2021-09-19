@@ -10,3 +10,5 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+    volumes:
+      - "${MINIO_STORAGE_DIR-/mnt/data}:/data"
