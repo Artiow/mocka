@@ -6,6 +6,7 @@ import org.mocka.runner.mapper.JSObjectMapper;
 import org.mocka.runner.model.ScriptRequest;
 import org.mocka.runner.model.ScriptResponse;
 import org.mocka.storage.ScriptStorage;
+import org.openjdk.nashorn.api.scripting.JSObject;
 import org.springframework.stereotype.Service;
 
 import javax.script.Invocable;
@@ -35,13 +36,30 @@ public class ScriptRunner {
             try (var reader = new InputStreamReader(storage.getScript())) {
                 engine.eval(reader);
             }
-            var body = ((Invocable) engine).invokeFunction(entrypoint, mapper.map(request));
+            var invocationResult = invokeEntrypoint(entrypoint, mapper.map(request));
             var scriptResponse = new ScriptResponse();
-            scriptResponse.setStatus(200);
-            scriptResponse.setBody(body);
+            scriptResponse.setStatus((Integer) invocationResult.getMember("status"));
+            scriptResponse.setBody(invocationResult.getMember("body"));
             return scriptResponse;
         } catch (Exception e) {
             throw new ScriptRunnerException("Exception occurred while script running", e);
         }
+    }
+
+
+    private synchronized JSObject invokeEntrypoint(String name, JSObject request) throws InvokeException {
+        Object response;
+        try {
+            response = ((Invocable) engine).invokeFunction(name, request);
+        } catch (Exception e) {
+            throw new InvokeException("Entrypoint function calling caused exception", e);
+        }
+        if (response == null) {
+            throw new InvokeException(InvokeException.Type.RESULT_IS_NULL, "Entrypoint function result must be not null");
+        }
+        if (!(response instanceof JSObject)) {
+            throw new InvokeException(InvokeException.Type.RESULT_IS_NOT_OBJECT, "Entrypoint function result must be JS object");
+        }
+        return (JSObject) response;
     }
 }
