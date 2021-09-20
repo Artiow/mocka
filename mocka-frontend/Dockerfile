@@ -5,9 +5,10 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY package.json /app
 COPY package-lock.json /app
-RUN npm install --production
+RUN npm ci --also=dev
 COPY public /app/public
 COPY src /app/src
+COPY webpack.config.js /app
 RUN npm run build
 
 # Package stage
