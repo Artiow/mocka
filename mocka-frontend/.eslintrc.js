@@ -28,6 +28,7 @@ const config = {
         'no-useless-catch': 'warn',
         'import/order': 'warn',
         'import/first': 'warn',
+        'react/react-in-jsx-scope': 'off',
       },
     },
     {
