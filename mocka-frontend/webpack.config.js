@@ -26,7 +26,7 @@ const config = {
     rules: [
       {
         test: /\.(js|jsx|ts|tsx)$/i,
-        include: path.resolve(__dirname, 'src'),
+        include: path.resolve('src'),
         use: [
           {
             loader: 'babel-loader',
@@ -38,7 +38,6 @@ const config = {
       },
       {
         test: /\.css$/,
-        include: path.resolve(__dirname, 'src'),
         use: [
           { loader: 'style-loader' },
           {
@@ -47,6 +46,14 @@ const config = {
               modules: {
                 auto: true,
                 localIdentName: IS_DEV ? '[name]-[local]-[hash:base64:8]' : '[hash:base64]',
+              },
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: ['tailwindcss', 'autoprefixer'],
               },
             },
           },
