@@ -1,0 +1,13 @@
+{
+  "include": ["src", "typings"],
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "checkJs": true,
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
