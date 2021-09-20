@@ -37,24 +37,18 @@ const config = {
         ],
       },
       {
-        test: /(?<!\.module)\.css$/,
+        test: /\.css$/,
         include: path.resolve(__dirname, 'src'),
         use: [
           { loader: 'style-loader' },
           {
             loader: 'css-loader',
-            options: { modules: false },
-          },
-        ],
-      },
-      {
-        test: /\.module\.css$/i,
-        include: path.resolve(__dirname, 'src'),
-        use: [
-          { loader: 'style-loader' },
-          {
-            loader: 'css-loader',
-            options: { modules: true },
+            options: {
+              modules: {
+                auto: true,
+                localIdentName: IS_DEV ? '[name]-[local]-[hash:base64:8]' : '[hash:base64]',
+              },
+            },
           },
         ],
       },
