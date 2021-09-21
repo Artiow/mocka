@@ -28,6 +28,8 @@ const config = {
         'no-useless-catch': 'warn',
         'import/order': 'warn',
         'import/first': 'warn',
+        'react/self-closing-comp': ['warn', { component: true, html: false }],
+        'react/jsx-handler-names': 'warn',
         'react/react-in-jsx-scope': 'off',
       },
     },
