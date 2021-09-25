@@ -3,7 +3,7 @@ const config = {
   mode: 'jit',
   purge: ['./src/**/*.tsx'],
   corePlugins: {
-    preflight: false,
+    preflight: true,
   },
 }
 
