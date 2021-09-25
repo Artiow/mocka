@@ -1,5 +1,6 @@
 const path = require('path')
 const DotenvPlugin = require('dotenv-webpack')
+const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -18,6 +19,7 @@ const config = {
   },
   resolve: {
     extensions: ['.ts', '.tsx', '...'],
+    plugins: [new TsConfigPathsPlugin()],
   },
   stats: IS_DEV ? 'minimal' : undefined,
   devtool: IS_DEV ? 'eval-source-map' : undefined,
