@@ -17,9 +17,9 @@ minio:
     secretKey: mocka-backend
 
 cors.allowed:
-  - localhost
-  - mocka.local
-  - mocka.org
+  - http://localhost
+  - http://mocka.local
+  - http://mocka.org
 
 logging:
   level:
