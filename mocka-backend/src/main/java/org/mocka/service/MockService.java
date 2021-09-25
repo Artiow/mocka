@@ -11,6 +11,8 @@ import javax.script.ScriptEngine;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
+import static org.mocka.util.DevelopConstants.SCRIPT;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class MockService {
 
 
     public String getScript(Integer id) {
-        try (var scriptStream = storage.getScript()) {
+        try (var scriptStream = storage.getScript(SCRIPT)) {
             return IOUtils.toString(scriptStream, StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -44,7 +46,7 @@ public class MockService {
         try {
             engine.eval(script);
             try (var scriptStream = new ByteArrayInputStream(script.getBytes(StandardCharsets.UTF_8))) {
-                storage.putScript(scriptStream);
+                storage.putScript(scriptStream, SCRIPT);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

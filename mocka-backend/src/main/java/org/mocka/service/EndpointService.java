@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Map;
 
+import static org.mocka.util.DevelopConstants.ENTRYPOINT;
+import static org.mocka.util.DevelopConstants.SCRIPT;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -35,7 +38,7 @@ public class EndpointService {
             scriptRequest.setBody(body);
             scriptRequest.setPathVars(Collections.emptyMap());
             scriptRequest.setRequestParams(params);
-            var scriptResponse = scriptRunner.invoke(scriptRequest);
+            var scriptResponse = scriptRunner.invoke(SCRIPT, ENTRYPOINT, scriptRequest);
             return ResponseEntity.status(scriptResponse.getStatus()).body(scriptResponse.getBody());
         } catch (ScriptRunnerException e) {
             log.error(e.getMessage(), e);

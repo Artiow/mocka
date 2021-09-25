@@ -4,6 +4,7 @@ spring:
 
 server:
   port: 8080
+  forward-headers-strategy: NATIVE
 
 api-info:
   title: Mocka API
@@ -20,6 +21,10 @@ cors.allowed:
   - localhost
   - mocka.local
   - mocka.org
+
+storage:
+  bucket: scripts
+  verify-connection-on-startup: true
 
 logging:
   level:

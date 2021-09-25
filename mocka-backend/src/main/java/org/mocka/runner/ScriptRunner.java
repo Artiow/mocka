@@ -1,7 +1,6 @@
 package org.mocka.runner;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.mocka.runner.mapper.JSObjectMapper;
 import org.mocka.runner.model.ScriptRequest;
 import org.mocka.runner.model.ScriptResponse;
@@ -13,27 +12,18 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import java.io.InputStreamReader;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScriptRunner {
-
-    @Deprecated(forRemoval = true)
-    private static final String ENTRYPOINT = "main";
 
     private final ScriptEngine engine;
     private final ScriptStorage storage;
     private final JSObjectMapper mapper;
 
 
-    @Deprecated(forRemoval = true)
-    public synchronized ScriptResponse invoke(ScriptRequest request) throws ScriptRunnerException {
-        return invoke(null, ENTRYPOINT, request);
-    }
-
     public synchronized ScriptResponse invoke(String script, String entrypoint, ScriptRequest request) throws ScriptRunnerException {
         try {
-            try (var reader = new InputStreamReader(storage.getScript())) {
+            try (var reader = new InputStreamReader(storage.getScript(script))) {
                 engine.eval(reader);
             }
             var invocationResult = invokeEntrypoint(entrypoint, mapper.map(request));
@@ -46,7 +36,6 @@ public class ScriptRunner {
         }
     }
 
-
     private synchronized JSObject invokeEntrypoint(String name, JSObject request) throws InvokeException {
         Object response;
         try {
@@ -55,10 +44,10 @@ public class ScriptRunner {
             throw new InvokeException("Entrypoint function calling caused exception", e);
         }
         if (response == null) {
-            throw new InvokeException(InvokeException.Type.RESULT_IS_NULL, "Entrypoint function result must be not null");
+            throw new InvokeException(InvokeException.Type.RESULT_IS_NULL, "Entrypoint function must not return null or undefined");
         }
         if (!(response instanceof JSObject)) {
-            throw new InvokeException(InvokeException.Type.RESULT_IS_NOT_OBJECT, "Entrypoint function result must be JS object");
+            throw new InvokeException(InvokeException.Type.RESULT_IS_NOT_OBJECT, "Entrypoint function must return an JS object");
         }
         return (JSObject) response;
     }
