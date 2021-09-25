@@ -1,9 +1,15 @@
 import Editor from '@monaco-editor/react'
 import { TailwindFont } from 'mocka/constants/tailwind-tokens'
-import { ScriptsExplorer } from './ScriptsExplorer'
+import { useQuery } from 'react-query'
+import { QueryKey } from 'mocka/constants/query-keys'
+import { apiGetScriptSample } from 'api'
+import { BiLoaderAlt } from 'react-icons/bi'
 import { Header } from './Header'
+import { ScriptsExplorer } from './ScriptsExplorer'
 
 export const App: React.FC = () => {
+  const { isLoading, data } = useQuery(QueryKey.ScriptSample, apiGetScriptSample)
+
   return (
     <div className='flex flex-col h-screen'>
       <Header />
@@ -12,14 +18,20 @@ export const App: React.FC = () => {
           <ScriptsExplorer />
         </div>
         <div className='w-5/6 pt-2 overflow-hidden'>
-          <Editor
-            className='font-sans'
-            defaultLanguage='javascript'
-            defaultValue={`// Your script goes here... \n\n`}
-            options={{
-              fontFamily: TailwindFont.Mono,
-            }}
-          />
+          {isLoading ? (
+            <div className='w-min animate-spin'>
+              <BiLoaderAlt className='text-4xl text-gray-600' />
+            </div>
+          ) : (
+            <Editor
+              className='font-sans'
+              defaultLanguage='javascript'
+              defaultValue={data}
+              options={{
+                fontFamily: TailwindFont.Mono,
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
