@@ -14,6 +14,7 @@ public class MinioClientConfiguration {
 
     private final MinioProperties minio;
 
+
     @Bean
     public MinioClient minioClient() {
         return MinioClient
