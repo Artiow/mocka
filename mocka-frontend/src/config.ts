@@ -1,3 +1,3 @@
 export const config = {
-  apiUrl: process.env.API_URL,
+  apiUrl: process.env.API_URL!,
 } as const
