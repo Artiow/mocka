@@ -50,6 +50,7 @@ const config = {
         '@typescript-eslint/no-empty-function': 'warn',
         '@typescript-eslint/no-unsafe-member-access': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'off',
       },
     },
   ],
