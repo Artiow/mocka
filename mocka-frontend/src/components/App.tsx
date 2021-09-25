@@ -1,5 +1,5 @@
 import Editor from '@monaco-editor/react'
-import { TailwindFont } from '../constants/tailwind-tokens'
+import { TailwindFont } from 'mocka/constants/tailwind-tokens'
 import { ScriptsExplorer } from './ScriptsExplorer'
 import { Header } from './Header'
 
