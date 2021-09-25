@@ -1,4 +1,5 @@
 const path = require('path')
+const DotenvPlugin = require('dotenv-webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -81,6 +82,7 @@ const config = {
 
 function configurePlugins() {
   const plugins = [
+    new DotenvPlugin({ path: '.env', safe: '.env.example' }),
     new MiniCssExtractPlugin(),
     new CleanTerminalPlugin(),
     new HtmlWebpackPlugin({
