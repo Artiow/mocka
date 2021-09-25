@@ -47,6 +47,7 @@ const config = {
       plugins: ['@typescript-eslint'],
       rules: {
         '@typescript-eslint/ban-types': 'warn',
+        '@typescript-eslint/no-empty-function': 'warn',
         '@typescript-eslint/no-unsafe-member-access': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
       },
