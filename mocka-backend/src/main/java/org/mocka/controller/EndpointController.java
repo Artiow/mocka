@@ -12,6 +12,7 @@ import java.util.Map;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @ApiIgnore
+@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 public class EndpointController {
