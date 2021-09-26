@@ -18,7 +18,6 @@ const config = {
       plugins: ['react', 'import'],
       rules: {
         'no-console': 'warn',
-        'no-shadow': 'warn',
         'no-empty': 'warn',
         'prefer-const': 'warn',
         'no-unused-vars': 'warn',
@@ -58,6 +57,7 @@ const config = {
       rules: {
         '@typescript-eslint/ban-types': 'warn',
         '@typescript-eslint/no-empty-function': 'warn',
+        '@typescript-eslint/no-shadow': 'warn',
         '@typescript-eslint/no-unused-vars': 'warn',
         '@typescript-eslint/no-unsafe-member-access': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
