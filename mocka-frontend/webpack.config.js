@@ -1,5 +1,8 @@
 const path = require('path')
+const DotenvPlugin = require('dotenv-webpack')
+const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const IS_DEV = process.env.NODE_ENV === 'development'
 
@@ -15,12 +18,16 @@ const config = {
   },
   resolve: {
     extensions: ['.ts', '.tsx', '...'],
+    plugins: [new TsConfigPathsPlugin()],
   },
-  stats: 'minimal',
+  stats: IS_DEV ? 'minimal' : undefined,
   devtool: IS_DEV ? 'eval-source-map' : undefined,
   devServer: {
     open: false,
     port: 80,
+    client: {
+      overlay: { errors: true, warnings: false },
+    },
   },
   module: {
     rules: [
@@ -31,6 +38,7 @@ const config = {
           {
             loader: 'babel-loader',
             options: {
+              plugins: [['@babel/plugin-transform-runtime']],
               presets: [
                 '@babel/preset-env',
                 '@babel/preset-typescript',
@@ -43,7 +51,7 @@ const config = {
       {
         test: /\.css$/,
         use: [
-          { loader: 'style-loader' },
+          { loader: MiniCssExtractPlugin.loader },
           {
             loader: 'css-loader',
             options: {
@@ -76,6 +84,8 @@ const config = {
 
 function configurePlugins() {
   const plugins = [
+    new DotenvPlugin({ path: '.env', safe: '.env.example' }),
+    new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
       template: './public/index.html',
       title: 'Mocka',
