@@ -1,13 +1,16 @@
 package org.mocka.storage;
 
-import io.minio.*;
+import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mocka.properties.StorageProperties;
+import org.mocka.service.MinioService;
+import org.mocka.util.ResourceFileUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.io.InputStream;
 
 @Slf4j
@@ -16,9 +19,7 @@ import java.io.InputStream;
 @EnableConfigurationProperties(StorageProperties.class)
 public class ScriptStorage {
 
-    private static final String JS = ".js";
-
-    private final MinioClient minioClient;
+    private final MinioService minioService;
     private final StorageProperties storageProperties;
 
 
@@ -30,16 +31,33 @@ public class ScriptStorage {
     }
 
 
+    public InputStream getSample() throws ScriptStorageException {
+        try {
+            return ResourceFileUtils.open("classpath:sample.js");
+        } catch (IOException e) {
+            throw new ScriptStorageException("Exception occurred while script sample getting", e);
+        }
+    }
+
+
+    public boolean scriptExists(String name) throws ScriptStorageException {
+        verifyBucket();
+        try {
+            return minioService.getObject(getBucketName(), getObjectName(name)) != null;
+        } catch (Exception e) {
+            if (e instanceof ErrorResponseException && "NoSuchKey".equals(((ErrorResponseException) e).errorResponse().code())) {
+                // only way to check object existence due Amazon S3 specification
+                return false;
+            } else {
+                throw new ScriptStorageException(String.format("Exception occurred while script \"%s\" existence checking", name), e);
+            }
+        }
+    }
+
     public InputStream getScript(String name) throws ScriptStorageException {
         verifyBucket();
         try {
-            return minioClient.getObject(
-                    GetObjectArgs
-                            .builder()
-                            .bucket(getBucket())
-                            .object(name + JS)
-                            .build()
-            );
+            return minioService.getObject(getBucketName(), getObjectName(name));
         } catch (Exception e) {
             throw new ScriptStorageException(String.format("Exception occurred while script \"%s\" getting", name), e);
         }
@@ -48,14 +66,7 @@ public class ScriptStorage {
     public void putScript(InputStream stream, String name) throws ScriptStorageException {
         verifyBucket();
         try {
-            minioClient.putObject(
-                    PutObjectArgs
-                            .builder()
-                            .stream(stream, stream.available(), -1)
-                            .bucket(getBucket())
-                            .object(name + JS)
-                            .build()
-            );
+            minioService.putObject(stream, getBucketName(), getObjectName(name));
         } catch (Exception e) {
             throw new ScriptStorageException(String.format("Exception occurred while script \"%s\" putting", name), e);
         }
@@ -64,19 +75,24 @@ public class ScriptStorage {
 
     private void verifyBucket() throws ScriptStorageException {
         try {
-            if (minioClient.bucketExists(BucketExistsArgs.builder().bucket(getBucket()).build())) {
-                log.debug(String.format("Bucket \"%s\" is ready", getBucket()));
+            if (minioService.bucketExists(getBucketName())) {
+                log.debug(String.format("Bucket \"%s\" is ready", getBucketName()));
             } else {
-                log.warn(String.format("Bucket \"%s\" does not exist! Trying to create...", getBucket()));
-                minioClient.makeBucket(MakeBucketArgs.builder().bucket(getBucket()).build());
-                log.info(String.format("Bucket \"%s\" has been created", getBucket()));
+                log.warn(String.format("Bucket \"%s\" does not exist! Trying to create...", getBucketName()));
+                minioService.makeBucket(getBucketName());
+                log.info(String.format("Bucket \"%s\" has been created", getBucketName()));
             }
         } catch (Exception e) {
             throw new ScriptStorageException("Failed to connect to minio", e);
         }
     }
 
-    private String getBucket() {
+
+    private String getBucketName() {
         return storageProperties.getBucket();
+    }
+
+    private String getObjectName(String name) {
+        return name + ".js";
     }
 }

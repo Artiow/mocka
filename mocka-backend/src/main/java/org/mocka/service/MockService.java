@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.mocka.storage.ScriptStorage;
-import org.mocka.util.ResourceFileUtils;
 import org.springframework.stereotype.Service;
 
 import javax.script.ScriptEngine;
@@ -23,7 +22,7 @@ public class MockService {
 
 
     public String getSample() {
-        try (var scriptStream = ResourceFileUtils.open("classpath:sample.js")) {
+        try (var scriptStream = storage.getSample()) {
             return IOUtils.toString(scriptStream, StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -33,12 +32,11 @@ public class MockService {
 
 
     public String getScript(Integer id) {
-        try (var scriptStream = storage.getScript(SCRIPT)) {
+        try (var scriptStream = storage.scriptExists(SCRIPT) ? storage.getScript(SCRIPT) : storage.getSample()) {
             return IOUtils.toString(scriptStream, StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            log.info("Sample returning");
-            return getSample();
+            return null;
         }
     }
 
