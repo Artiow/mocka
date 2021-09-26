@@ -14,8 +14,8 @@ api-info:
 minio:
   endpoint: http://minio:9000
   credentials:
-    accessKey: mocka-backend
-    secretKey: mocka-backend
+    accessKey: minioadmin
+    secretKey: minioadmin
 
 cors.allowed:
   - http://localhost
@@ -29,5 +29,4 @@ storage:
 logging:
   level:
     root: INFO
-    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
     org.mocka: DEBUG

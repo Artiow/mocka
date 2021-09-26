@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 @Service
@@ -17,13 +18,12 @@ import java.io.InputStreamReader;
 public class ScriptRunner {
 
     private final ScriptEngine engine;
-    private final ScriptStorage storage;
     private final JSObjectMapper mapper;
 
 
-    public synchronized ScriptResponse invoke(String script, String entrypoint, ScriptRequest request) throws ScriptRunnerException {
+    public synchronized ScriptResponse invoke(InputStream script, String entrypoint, ScriptRequest request) throws ScriptRunnerException {
         try {
-            try (var reader = new InputStreamReader(storage.getScript(script))) {
+            try (var reader = new InputStreamReader(script)) {
                 engine.eval(reader);
             }
             var invocationResult = invokeEntrypoint(entrypoint, mapper.map(request));
@@ -36,7 +36,7 @@ public class ScriptRunner {
         }
     }
 
-    private synchronized JSObject invokeEntrypoint(String name, JSObject request) throws InvokeException {
+    private JSObject invokeEntrypoint(String name, JSObject request) throws InvokeException {
         Object response;
         try {
             response = ((Invocable) engine).invokeFunction(name, request);

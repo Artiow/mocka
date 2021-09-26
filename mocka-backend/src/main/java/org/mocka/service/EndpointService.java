@@ -3,8 +3,8 @@ package org.mocka.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mocka.runner.ScriptRunner;
-import org.mocka.runner.ScriptRunnerException;
 import org.mocka.runner.model.ScriptRequest;
+import org.mocka.storage.ScriptStorage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +21,7 @@ import static org.mocka.util.DevelopConstants.SCRIPT;
 public class EndpointService {
 
     private final ScriptRunner scriptRunner;
+    private final ScriptStorage scriptStorage;
 
 
     public ResponseEntity<Object> handle(
@@ -38,9 +39,13 @@ public class EndpointService {
             scriptRequest.setBody(body);
             scriptRequest.setPathVars(Collections.emptyMap());
             scriptRequest.setRequestParams(params);
-            var scriptResponse = scriptRunner.invoke(SCRIPT, ENTRYPOINT, scriptRequest);
+            var scriptResponse = scriptRunner.invoke(
+                    scriptStorage.getScript(SCRIPT),
+                    ENTRYPOINT,
+                    scriptRequest
+            );
             return ResponseEntity.status(scriptResponse.getStatus()).body(scriptResponse.getBody());
-        } catch (ScriptRunnerException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             return null; // todo exception handling
         }

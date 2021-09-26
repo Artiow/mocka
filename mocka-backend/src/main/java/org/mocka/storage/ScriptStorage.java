@@ -43,7 +43,7 @@ public class ScriptStorage {
     public boolean scriptExists(String name) throws ScriptStorageException {
         verifyBucket();
         try {
-            return minioService.getObject(getBucketName(), getObjectName(name)) != null;
+            return minioService.getObject(getBucketName(), name) != null;
         } catch (Exception e) {
             if (e instanceof ErrorResponseException && "NoSuchKey".equals(((ErrorResponseException) e).errorResponse().code())) {
                 // only way to check object existence due Amazon S3 specification
@@ -57,7 +57,7 @@ public class ScriptStorage {
     public InputStream getScript(String name) throws ScriptStorageException {
         verifyBucket();
         try {
-            return minioService.getObject(getBucketName(), getObjectName(name));
+            return minioService.getObject(getBucketName(), name);
         } catch (Exception e) {
             throw new ScriptStorageException(String.format("Exception occurred while script \"%s\" getting", name), e);
         }
@@ -66,7 +66,7 @@ public class ScriptStorage {
     public void putScript(InputStream stream, String name) throws ScriptStorageException {
         verifyBucket();
         try {
-            minioService.putObject(stream, getBucketName(), getObjectName(name));
+            minioService.putObject(stream, getBucketName(), name);
         } catch (Exception e) {
             throw new ScriptStorageException(String.format("Exception occurred while script \"%s\" putting", name), e);
         }
@@ -90,9 +90,5 @@ public class ScriptStorage {
 
     private String getBucketName() {
         return storageProperties.getBucket();
-    }
-
-    private String getObjectName(String name) {
-        return name + ".js";
     }
 }
