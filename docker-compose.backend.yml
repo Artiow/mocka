@@ -5,6 +5,8 @@ services:
     build: mocka-backend/
     ports:
       - "8080:8080"
+    command: >
+      --storage.verify-connection-on-startup=false
     depends_on:
       - minio
   minio:
