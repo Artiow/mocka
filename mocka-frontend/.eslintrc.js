@@ -18,6 +18,7 @@ const config = {
       plugins: ['react', 'import'],
       rules: {
         'no-console': 'warn',
+        'no-shadow': 'warn',
         'no-empty': 'warn',
         'prefer-const': 'warn',
         'no-unused-vars': 'warn',
@@ -29,7 +30,16 @@ const config = {
         'import/order': 'warn',
         'import/first': 'warn',
         'react/self-closing-comp': ['warn', { component: true, html: false }],
-        'react/jsx-handler-names': 'warn',
+        'react/jsx-handler-names': [
+          'warn',
+          {
+            eventHandlerPrefix: 'handle',
+            eventHandlerPropPrefix: 'on',
+            checkLocalVariables: true,
+            checkInlineFunction: true,
+          },
+        ],
+        'no-constant-condition': 'warn',
         'react/react-in-jsx-scope': 'off',
       },
     },
@@ -48,6 +58,7 @@ const config = {
       rules: {
         '@typescript-eslint/ban-types': 'warn',
         '@typescript-eslint/no-empty-function': 'warn',
+        '@typescript-eslint/no-unused-vars': 'warn',
         '@typescript-eslint/no-unsafe-member-access': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
         '@typescript-eslint/no-non-null-assertion': 'off',

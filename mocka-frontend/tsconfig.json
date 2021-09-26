@@ -4,7 +4,8 @@
     "baseUrl": "src",
     "paths": {
       "mocka/config": ["config.ts"],
-      "mocka/constants/*": ["constants/*"]
+      "mocka/constants/*": ["constants/*"],
+      "mocka/api/*": ["api/*"]
     },
     "module": "CommonJS",
     "moduleResolution": "node",
