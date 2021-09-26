@@ -1,6 +1,9 @@
 function main(request) {
-    return JSON.stringify({
-        "message": "Hello World!",
-        "request": request
-    });
+    return {
+        "status": 200,
+        "body": JSON.stringify({
+            "message": "Hello World!",
+            "request": request
+        })
+    };
 }

@@ -20,6 +20,7 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
 
     private final ApiInfoProperties apiInfo;
 
+
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.OAS_30)

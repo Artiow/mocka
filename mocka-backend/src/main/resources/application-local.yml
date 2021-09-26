@@ -1,1 +1,2 @@
 minio.endpoint: http://localhost:9000
+storage.verify-connection-on-startup: false

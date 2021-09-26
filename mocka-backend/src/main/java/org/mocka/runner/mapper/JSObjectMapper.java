@@ -1,4 +1,4 @@
-package org.mocka.runner;
+package org.mocka.runner.mapper;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -68,7 +68,7 @@ public class JSObjectMapper {
 
 
     private boolean isValue(Object value) {
-        return value.getClass().isPrimitive() || value instanceof String;
+        return value == null || value.getClass().isPrimitive() || value instanceof String;
     }
 
     private boolean isObject(Object value) {

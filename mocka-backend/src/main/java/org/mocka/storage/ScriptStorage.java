@@ -3,6 +3,8 @@ package org.mocka.storage;
 import io.minio.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mocka.properties.StorageProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -11,31 +13,22 @@ import java.io.InputStream;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@EnableConfigurationProperties(StorageProperties.class)
 public class ScriptStorage {
 
-    @Deprecated(forRemoval = true)
-    private static final String SCRIPT = "script";
-
-    private static final String BUCKET = "scripts";
     private static final String JS = ".js";
 
     private final MinioClient minioClient;
+    private final StorageProperties storageProperties;
 
 
     @PostConstruct
-    private void init() {
-        try {
+    private void init() throws ScriptStorageException {
+        if (storageProperties.getVerifyConnectionOnStartup()) {
             verifyBucket();
-        } catch (Exception e) {
-            log.error("Failed to connect to minio", e);
         }
     }
 
-
-    @Deprecated(forRemoval = true)
-    public InputStream getScript() throws ScriptStorageException {
-        return getScript(SCRIPT);
-    }
 
     public InputStream getScript(String name) throws ScriptStorageException {
         verifyBucket();
@@ -43,19 +36,13 @@ public class ScriptStorage {
             return minioClient.getObject(
                     GetObjectArgs
                             .builder()
-                            .bucket(BUCKET)
+                            .bucket(getBucket())
                             .object(name + JS)
                             .build()
             );
         } catch (Exception e) {
             throw new ScriptStorageException(String.format("Exception occurred while script \"%s\" getting", name), e);
         }
-    }
-
-
-    @Deprecated(forRemoval = true)
-    public void putScript(InputStream stream) throws ScriptStorageException {
-        putScript(stream, SCRIPT);
     }
 
     public void putScript(InputStream stream, String name) throws ScriptStorageException {
@@ -65,7 +52,7 @@ public class ScriptStorage {
                     PutObjectArgs
                             .builder()
                             .stream(stream, stream.available(), -1)
-                            .bucket(BUCKET)
+                            .bucket(getBucket())
                             .object(name + JS)
                             .build()
             );
@@ -77,15 +64,19 @@ public class ScriptStorage {
 
     private void verifyBucket() throws ScriptStorageException {
         try {
-            if (minioClient.bucketExists(BucketExistsArgs.builder().bucket(BUCKET).build())) {
-                log.debug(String.format("Bucket \"%s\" is ready", BUCKET));
+            if (minioClient.bucketExists(BucketExistsArgs.builder().bucket(getBucket()).build())) {
+                log.debug(String.format("Bucket \"%s\" is ready", getBucket()));
             } else {
-                log.warn(String.format("Bucket \"%s\" does not exist! Trying to create...", BUCKET));
-                minioClient.makeBucket(MakeBucketArgs.builder().bucket(BUCKET).build());
-                log.info(String.format("Bucket \"%s\" has been created", BUCKET));
+                log.warn(String.format("Bucket \"%s\" does not exist! Trying to create...", getBucket()));
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(getBucket()).build());
+                log.info(String.format("Bucket \"%s\" has been created", getBucket()));
             }
         } catch (Exception e) {
             throw new ScriptStorageException("Failed to connect to minio", e);
         }
+    }
+
+    private String getBucket() {
+        return storageProperties.getBucket();
     }
 }
