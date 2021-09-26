@@ -2,7 +2,6 @@ const path = require('path')
 const DotenvPlugin = require('dotenv-webpack')
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CleanTerminalPlugin = require('clean-terminal-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const IS_DEV = process.env.NODE_ENV === 'development'
@@ -87,7 +86,6 @@ function configurePlugins() {
   const plugins = [
     new DotenvPlugin({ path: '.env', safe: '.env.example' }),
     new MiniCssExtractPlugin(),
-    new CleanTerminalPlugin(),
     new HtmlWebpackPlugin({
       template: './public/index.html',
       title: 'Mocka',
