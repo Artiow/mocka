@@ -10,7 +10,7 @@ import { Header } from './Header'
 import { ScriptsExplorer } from './ScriptsExplorer'
 
 const SCRIPT_ID = 0
-const EDITOR_TOP_MAPPING_PX = 5
+const EDITOR_TOP_MARGIN_PX = 5
 
 export const App: React.FC = () => {
   const editorRef = useRef<Monaco.IStandaloneCodeEditor>()
@@ -62,7 +62,7 @@ export const App: React.FC = () => {
                 defaultLanguage='javascript'
                 options={{
                   fontFamily: TailwindFont.Mono,
-                  padding: { top: EDITOR_TOP_MAPPING_PX },
+                  padding: { top: EDITOR_TOP_MARGIN_PX },
                   minimap: { enabled: false },
                 }}
                 onMount={handleEditorMount}
