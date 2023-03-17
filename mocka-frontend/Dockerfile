@@ -8,7 +8,7 @@ COPY package-lock.json /app
 RUN npm ci --also=dev
 COPY public /app/public
 COPY src /app/src
-COPY webpack.config.js /app
+COPY webpack.config.js tsconfig.json tailwind.config.js .env .env.example /app/
 RUN npm run build
 
 # Package stage
