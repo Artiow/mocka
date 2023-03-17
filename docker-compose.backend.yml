@@ -3,14 +3,14 @@ version: '3.7'
 services:
   mocka-backend:
     build: mocka-backend/
+    container_name: mocka-backend
     ports:
       - "8080:8080"
-    command: >
-      --storage.verify-connection-on-startup=false
     depends_on:
       - minio
   minio:
     image: minio/minio
+    container_name: minio
     command: server /data --console-address ":9001"
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}

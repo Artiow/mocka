@@ -4,10 +4,10 @@ services:
   mocka-frontend:
     build: mocka-frontend/
     container_name: mocka-frontend
-    depends_on:
-      - mocka-backend
     ports:
       - "80:80"
+    depends_on:
+      - mocka-backend
   mocka-backend:
     build: mocka-backend/
     container_name: mocka-backend
