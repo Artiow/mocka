@@ -13,6 +13,14 @@ services:
     container_name: mocka-backend
     depends_on:
       - minio
+  mongo:
+    image: mongo:6.0.5-jammy
+    container_name: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+    volumes:
+      - "${MONGO_DATA_DIR}:/data/db"
   minio:
     image: minio/minio
     container_name: minio
@@ -23,4 +31,4 @@ services:
     ports:
       - "9001:9001"
     volumes:
-      - "${MINIO_STORAGE_DIR}:/data"
+      - "${MINIO_DATA_DIR}:/data"
