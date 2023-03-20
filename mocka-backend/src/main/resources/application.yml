@@ -31,6 +31,10 @@ cors:
 storage:
   bucket: scripts
   verify-connection-on-startup: true
+  verify-connection-on-calls: false
+
+script-engine:
+  version: es6
 
 logging:
   level:

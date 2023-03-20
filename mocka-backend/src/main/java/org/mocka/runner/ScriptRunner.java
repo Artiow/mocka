@@ -10,20 +10,23 @@ import org.springframework.stereotype.Service;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 
 @Service
 @RequiredArgsConstructor
 public class ScriptRunner {
 
+    private final ScriptStorage storage;
     private final ScriptEngine engine;
     private final JSObjectMapper mapper;
 
 
-    public synchronized ScriptResponse invoke(InputStream script, String entrypoint, ScriptRequest request) throws ScriptRunnerException {
+    //todo: make thread-safe
+    public synchronized ScriptResponse run(String scriptName, String entrypoint, ScriptRequest request)
+            throws ScriptRunnerException {
         try {
-            try (var reader = new InputStreamReader(script)) {
+            var scriptFile = storage.getScript(scriptName);
+            try (var reader = new InputStreamReader(scriptFile)) {
                 engine.eval(reader);
             }
             var invocationResult = invokeEntrypoint(entrypoint, mapper.map(request));

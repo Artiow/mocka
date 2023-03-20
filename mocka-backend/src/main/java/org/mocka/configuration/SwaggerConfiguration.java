@@ -2,7 +2,6 @@ package org.mocka.configuration;
 
 import lombok.RequiredArgsConstructor;
 import org.mocka.properties.ApiInfoProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -15,7 +14,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableConfigurationProperties(ApiInfoProperties.class)
 public class SwaggerConfiguration implements WebMvcConfigurer {
 
     private final ApiInfoProperties apiInfo;

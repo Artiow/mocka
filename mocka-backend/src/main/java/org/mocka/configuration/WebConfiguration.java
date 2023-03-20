@@ -2,7 +2,6 @@ package org.mocka.configuration;
 
 import lombok.RequiredArgsConstructor;
 import org.mocka.properties.CorsProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableConfigurationProperties(CorsProperties.class)
 public class WebConfiguration implements WebMvcConfigurer {
 
     private final CorsProperties cors;

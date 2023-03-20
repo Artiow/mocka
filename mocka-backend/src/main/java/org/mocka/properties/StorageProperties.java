@@ -11,4 +11,5 @@ public class StorageProperties {
 
     private String bucket;
     private Boolean verifyConnectionOnStartup;
+    private Boolean verifyConnectionOnCalls;
 }
