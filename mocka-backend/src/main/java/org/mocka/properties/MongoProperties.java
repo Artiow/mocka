@@ -6,17 +6,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties("minio")
-public class MinioProperties {
+@ConfigurationProperties("mongo")
+public class MongoProperties {
 
     private String url;
+    private String database;
     private Credentials credentials;
 
     @Getter
     @Setter
     public static class Credentials {
 
-        private String accessKey;
-        private String secretKey;
+        private String username;
+        private String password;
     }
 }

@@ -11,8 +11,15 @@ api-info:
   description: The RESTful API mocking service. User API documentation.
   version: @project.version@
 
+mongo:
+  url: mongodb://mongo:27017
+  database: mocka
+  credentials:
+    username: mongoadmin
+    password: mongoadmin
+
 minio:
-  endpoint: http://minio:9000
+  url: http://minio:9000
   credentials:
     accessKey: minioadmin
     secretKey: minioadmin
