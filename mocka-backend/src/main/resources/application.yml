@@ -32,6 +32,8 @@ storage:
   bucket: scripts
   verify-connection-on-startup: true
   verify-connection-on-calls: false
+  verify-connection-on-schedule: true
+  verify-connection-on-schedule-rate: 1m
 
 script-engine:
   version: es6
