@@ -36,13 +36,13 @@ public class MockController {
 
 
     @GetMapping(value = "/method/{id}/script", produces = "text/javascript")
-    public ResponseEntity<String> getScript(@PathVariable Integer id) {
+    public ResponseEntity<String> getScript(@PathVariable String id) {
         var script = service.getScript(id);
         return ResponseEntity.ok(script);
     }
 
     @PutMapping(value = "/method/{id}/script", consumes = {"application/javascript", "application/ecmascript", "text/javascript", "text/ecmascript"})
-    public ResponseEntity<Void> uploadScript(@PathVariable Integer id, @RequestBody String script) {
+    public ResponseEntity<Void> uploadScript(@PathVariable String id, @RequestBody String script) {
         service.uploadScript(id, script);
         return ResponseEntity.noContent().build();
     }

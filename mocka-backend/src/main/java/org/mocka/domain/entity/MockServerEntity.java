@@ -1,14 +1,17 @@
 package org.mocka.domain.entity;
 
-import lombok.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
-
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
 
 @Getter
 @Setter
@@ -26,11 +29,11 @@ public class MockServerEntity {
 
     @Builder
     private MockServerEntity(
-            Collection<MockEndpointEntity> endpoints,
-            LocalDateTime createDateTime,
-            LocalDateTime updateDateTime
+        Collection<MockEndpointEntity> endpoints,
+        LocalDateTime createDateTime,
+        LocalDateTime updateDateTime
     ) {
-        this.endpoints = Optional.ofNullable(endpoints).orElse(Collections.emptyList());
+        this.endpoints = Optional.ofNullable(endpoints).orElse(new ArrayList<>());
         this.createDateTime = createDateTime;
         this.updateDateTime = updateDateTime;
     }
