@@ -1,6 +1,10 @@
 package org.mocka.storage;
 
 import io.minio.errors.ErrorResponseException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.Instant;
+import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mocka.properties.StorageProperties;
@@ -8,11 +12,6 @@ import org.mocka.service.MinioService;
 import org.mocka.util.ResourceFileUtils;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.Instant;
 
 @Slf4j
 @Service
@@ -53,11 +52,12 @@ public class ScriptStorage {
         try {
             return minioService.getObject(getBucketName(), name) != null;
         } catch (Exception e) {
-            if (e instanceof ErrorResponseException && "NoSuchKey".equals(((ErrorResponseException) e).errorResponse().code())) {
+            if (isExceptionNoSuckKey(e)) {
                 // the only way to check object existence due Amazon S3 specification
                 return false;
             } else {
-                throw new ScriptStorageException(String.format("Exception occurred while script \"%s\" existence checking", name), e);
+                throw new ScriptStorageException(
+                    "Exception occurred while script \"{}\" existence checking", name, e);
             }
         }
     }
@@ -69,12 +69,23 @@ public class ScriptStorage {
         try {
             return minioService.getObject(getBucketName(), name);
         } catch (Exception e) {
-            if (e instanceof ErrorResponseException && "NoSuchKey".equals(((ErrorResponseException) e).errorResponse().code())) {
+            if (isExceptionNoSuckKey(e)) {
                 // the only way to check object existence due Amazon S3 specification
-                throw new ScriptStorageException(String.format("Script \"%s\" does not exist", name), e);
+                throw new ScriptStorageException(
+                    "Script \"{}\" does not exist", name, e);
             } else {
-                throw new ScriptStorageException(String.format("Exception occurred while script \"%s\" getting", name), e);
+                throw new ScriptStorageException(
+                    "Exception occurred while script \"{}\" getting", name, e);
             }
+        }
+    }
+
+
+    public void putSampleAs(String name) throws ScriptStorageException {
+        try (var sample = getSample()) {
+            putScript(sample, name);
+        } catch (IOException e) {
+            // todo: handle an exception that occurs when stream closing
         }
     }
 
@@ -85,8 +96,15 @@ public class ScriptStorage {
         try {
             minioService.putObject(stream, getBucketName(), name);
         } catch (Exception e) {
-            throw new ScriptStorageException(String.format("Exception occurred while script \"%s\" putting", name), e);
+            throw new ScriptStorageException(
+                "Exception occurred while script \"{}\" putting", name, e);
         }
+    }
+
+
+    private boolean isExceptionNoSuckKey(Exception e) {
+        return e instanceof ErrorResponseException
+            && "NoSuchKey".equals(((ErrorResponseException) e).errorResponse().code());
     }
 
 
@@ -105,16 +123,18 @@ public class ScriptStorage {
     private void verifyBucket(boolean orCreate) throws ScriptStorageException {
         try {
             if (minioService.bucketExists(getBucketName())) {
-                log.debug(String.format("Bucket \"%s\" is ready", getBucketName()));
+                log.debug("Bucket \"{}\" is ready", getBucketName());
             } else if (orCreate) {
-                log.warn(String.format("Bucket \"%s\" does not exist! Trying to create...", getBucketName()));
+                log.warn("Bucket \"{}\" does not exist! Trying to create...", getBucketName());
                 minioService.makeBucket(getBucketName());
-                log.info(String.format("Bucket \"%s\" has been created", getBucketName()));
+                log.info("Bucket \"{}\" has been created", getBucketName());
             } else {
-                throw new ScriptStorageException(String.format("Bucket \"%s\" does no longer exists", getBucketName()));
+                throw new ScriptStorageException(
+                    "Bucket \"{}\" does no longer exists", getBucketName());
             }
         } catch (Exception e) {
-            throw new ScriptStorageException(String.format("Bucket \"%s\" verifying failed", getBucketName()), e);
+            throw new ScriptStorageException(
+                "Bucket \"{}\" verifying failed", getBucketName(), e);
         }
     }
 
