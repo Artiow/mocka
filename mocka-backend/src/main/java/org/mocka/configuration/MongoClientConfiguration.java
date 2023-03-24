@@ -17,7 +17,7 @@ import javax.annotation.PostConstruct;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-@EnableMongoRepositories(basePackages = {"org.mocka.domain.repository"})
+@EnableMongoRepositories(basePackages = {"org.mocka.domain"})
 public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
 
     private final MongoProperties mongo;

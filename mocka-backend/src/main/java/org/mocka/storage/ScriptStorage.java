@@ -49,8 +49,8 @@ public class ScriptStorage {
         if (storageProperties.getVerifyConnectionOnCalls()) {
             verifyBucket();
         }
-        try {
-            return minioService.getObject(getBucketName(), name) != null;
+        try (var script = minioService.getObject(getBucketName(), name)) {
+            return script != null;
         } catch (Exception e) {
             if (isExceptionNoSuckKey(e)) {
                 // the only way to check object existence due Amazon S3 specification
@@ -70,7 +70,6 @@ public class ScriptStorage {
             return minioService.getObject(getBucketName(), name);
         } catch (Exception e) {
             if (isExceptionNoSuckKey(e)) {
-                // the only way to check object existence due Amazon S3 specification
                 throw new ScriptStorageException(
                     "Script \"{}\" does not exist", name, e);
             } else {
