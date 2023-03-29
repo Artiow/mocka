@@ -1,6 +1,7 @@
 package org.mocka.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,22 +14,34 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 @Setter
 @Builder
 @Document("server")
-public class MockServerDocument {
+public class MockServerDocument implements MongoDocument {
 
     @MongoId
     private ObjectId id;
-    private Collection<MockEndpoint> endpoints;
+    private Collection<MockEndpointEmbeddedDocument> endpoints;
     private LocalDateTime createDateTime;
     private LocalDateTime updateDateTime;
 
 
-    @Getter
-    @Setter
-    @Builder
-    public static class MockEndpoint {
+    public static class MockServerDocumentBuilder {
 
-        private ObjectId id;
-        private String method;
-        private String path;
+        private MockServerDocumentBuilder complete() {
+            if (this.id == null) {
+                this.id(new ObjectId());
+            }
+            if (this.endpoints == null) {
+                this.endpoints(new ArrayList<>());
+            }
+            if (this.createDateTime == null && this.updateDateTime == null) {
+                var now = LocalDateTime.now();
+                this.createDateTime(now);
+                this.updateDateTime(now);
+            }
+            return this;
+        }
+
+        public MockServerDocument completeAndBuild() {
+            return this.complete().build();
+        }
     }
 }

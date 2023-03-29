@@ -1,11 +1,10 @@
 package org.mocka.service;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.bson.types.ObjectId;
+import org.mocka.domain.MockEndpointEmbeddedDocument;
 import org.mocka.domain.MockServerDocument;
 import org.mocka.domain.MockServerDocumentCollection;
 import org.mocka.dto.MockServerDto;
@@ -32,8 +31,7 @@ public class MockService {
     @Transactional
     public String createMockServer() {
         try {
-            var now = LocalDateTime.now();
-            var mockServer = MockServerDocument.builder().createDateTime(now).updateDateTime(now).build();
+            var mockServer = MockServerDocument.builder().completeAndBuild();
             var mockEndpointId = addMockEndpoint(mockServer, MockEndpointSettings.DEFAULT);
             var mockServerId = collection.insert(mockServer).getId().toString();
             storage.putSampleAs(mockEndpointId);
@@ -47,12 +45,11 @@ public class MockService {
     private String addMockEndpoint(MockServerDocument mockServer, MockEndpointSettings settings) {
         // todo: check mock endpoint uniqueness
 
-        var mockEndpoint = MockServerDocument.MockEndpoint
+        var mockEndpoint = MockEndpointEmbeddedDocument
             .builder()
-            .id(ObjectId.get())
             .method(settings.getMethod().toString())
             .path(settings.getPath())
-            .build();
+            .completeAndBuild();
 
         mockServer.getEndpoints().add(mockEndpoint);
         return mockEndpoint.getId().toString();
