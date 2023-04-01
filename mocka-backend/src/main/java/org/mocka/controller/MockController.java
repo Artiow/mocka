@@ -3,8 +3,16 @@ package org.mocka.controller;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.mocka.service.MockService;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Api(tags = "Mock management")
 @RestController
@@ -13,6 +21,17 @@ public class MockController {
 
     private final MockService service;
 
+
+    @PostMapping(value = "/server")
+    public ResponseEntity<Void> createMockServer(HttpRequest request) {
+        var mockServerId = service.createMockServer();
+        return ResponseEntity
+            .created(UriComponentsBuilder
+                .fromHttpRequest(request)
+                .path("/{mockServerId}")
+                .build(mockServerId))
+            .build();
+    }
 
     @GetMapping(value = "/method/{id}")
     public ResponseEntity<Void> get(@PathVariable Integer id) {

@@ -8,6 +8,7 @@ services:
       - "8080:8080"
     depends_on:
       - minio
+      - mongo
   mongo-express:
     # dev tool
     image: mongo-express:1.0.0-alpha
