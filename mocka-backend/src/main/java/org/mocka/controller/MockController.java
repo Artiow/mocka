@@ -1,9 +1,9 @@
 package org.mocka.controller;
 
 import io.swagger.annotations.Api;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.mocka.service.MockService;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,11 +23,11 @@ public class MockController {
 
 
     @PostMapping(value = "/server")
-    public ResponseEntity<Void> createMockServer(HttpRequest request) {
+    public ResponseEntity<Void> createMockServer(HttpServletRequest request) {
         var mockServerId = service.createMockServer();
         return ResponseEntity
             .created(UriComponentsBuilder
-                .fromHttpRequest(request)
+                .fromUriString(request.getRequestURI())
                 .path("/{mockServerId}")
                 .build(mockServerId))
             .build();

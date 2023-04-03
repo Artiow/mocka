@@ -12,17 +12,29 @@ services:
     ports:
       - "8081:8081"
     depends_on:
+      - mongo-initializer
+  mongo-initializer:
+    build: mongo-initializer/
+    container_name: mongo-initializer
+    network_mode: container:mongo
+    environment:
+      - MONGO_RS_ID=rs0
+      - MONGO_RS_HOST=mongo:27017
+      - MONGO_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+    depends_on:
       - mongo
   mongo:
     image: mongo:6.0.5-jammy
     container_name: mongo
+    command: mongod --auth --keyFile /keyfile --replSet rs0 --bind_ip localhost,mongo
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=mocka
     ports:
       - "27017:27017"
     volumes:
       - "${MONGO_DATA_DIR}:/data/db"
+      - "${MONGO_KEYFILE}:/keyfile"
   minio:
     image: minio/minio
     container_name: minio

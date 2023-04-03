@@ -94,6 +94,7 @@ public class ScriptStorage {
         }
         try {
             minioService.putObject(stream, getBucketName(), name);
+            log.debug("Script \"{}\" added successfully", name);
         } catch (Exception e) {
             throw new ScriptStorageException(
                 "Exception occurred while script \"{}\" putting", name, e);
