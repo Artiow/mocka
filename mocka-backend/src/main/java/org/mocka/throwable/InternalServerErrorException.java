@@ -2,8 +2,7 @@ package org.mocka.throwable;
 
 public class InternalServerErrorException extends NestedRuntimeException {
 
-    public InternalServerErrorException() {
-    }
+    public InternalServerErrorException() { }
 
     public InternalServerErrorException(String message) {
         super(message);

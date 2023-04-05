@@ -1,32 +1,32 @@
 package org.mocka.runner;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
 import lombok.RequiredArgsConstructor;
 import org.mocka.runner.mapper.JSObjectMapper;
 import org.mocka.runner.model.ScriptRequest;
 import org.mocka.runner.model.ScriptResponse;
-import org.mocka.storage.ScriptStorage;
 import org.openjdk.nashorn.api.scripting.JSObject;
 import org.springframework.stereotype.Service;
-
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import java.io.InputStreamReader;
 
 @Service
 @RequiredArgsConstructor
 public class ScriptRunner {
 
-    private final ScriptStorage storage;
     private final ScriptEngine engine;
     private final JSObjectMapper mapper;
 
 
     //todo: make thread-safe
-    public synchronized ScriptResponse run(String scriptName, String entrypoint, ScriptRequest request)
-            throws ScriptRunnerException {
+    public synchronized ScriptResponse run(
+        InputStream scriptStream,
+        String entrypoint,
+        ScriptRequest request
+    ) throws ScriptRunnerException {
         try {
-            var scriptFile = storage.getScript(scriptName);
-            try (var reader = new InputStreamReader(scriptFile)) {
+            try (var reader = new InputStreamReader(scriptStream)) {
                 engine.eval(reader);
             }
             var invocationResult = invokeEntrypoint(entrypoint, mapper.map(request));

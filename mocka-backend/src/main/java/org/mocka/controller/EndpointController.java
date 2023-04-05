@@ -1,18 +1,29 @@
 package org.mocka.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.HEAD;
+import static org.springframework.web.bind.annotation.RequestMethod.OPTIONS;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
+import static org.springframework.web.bind.annotation.RequestMethod.TRACE;
+
+import java.util.Map;
+import java.util.UUID;
+import java.util.regex.Pattern;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.util.RequestUtil;
 import org.mocka.service.EndpointService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import java.util.Map;
-import java.util.regex.Pattern;
-
-import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @ApiIgnore
 @CrossOrigin("*")
@@ -23,15 +34,15 @@ public class EndpointController {
     private final EndpointService service;
 
 
-    @RequestMapping(value = "/endpoint/{subdomain}/**", method = {GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE})
+    @RequestMapping(
+        value = "/mock/{mockServerId}/**",
+        method = {GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE})
     public ResponseEntity<Object> handle(
-            HttpServletRequest request,
-            @PathVariable String subdomain,
-            @RequestBody(required = false) String body,
-            @RequestParam Map<String, String> params
-    ) {
-        var forwardedRequest = new ForwardedHttpServletRequest(request, Pattern.compile("/endpoint/[^/]*/"), "/");
-        return service.handle(forwardedRequest, subdomain, body, params);
+        HttpServletRequest request,
+        @PathVariable UUID mockServerId,
+        @RequestParam Map<String, Object> params) {
+        var forwardedRequest = new ForwardedHttpServletRequest(request, Pattern.compile("/mock/[^/]*/"), "/");
+        return service.handle(forwardedRequest, mockServerId, params);
     }
 
 

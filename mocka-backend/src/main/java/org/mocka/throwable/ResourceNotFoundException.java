@@ -2,8 +2,7 @@ package org.mocka.throwable;
 
 public class ResourceNotFoundException extends NestedRuntimeException {
 
-    public ResourceNotFoundException() {
-    }
+    public ResourceNotFoundException() { }
 
     public ResourceNotFoundException(String message) {
         super(message);

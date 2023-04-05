@@ -1,0 +1,10 @@
+[
+  {"$unwind": {
+      "path": "$endpoints"
+  }},
+  {"$project": {
+      "_id": 0,
+      "server._id": "$_id",
+      "endpoint": "$endpoints"
+  }}
+]

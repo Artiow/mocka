@@ -1,8 +1,9 @@
 package org.mocka.controller;
 
 import io.swagger.annotations.Api;
-import javax.servlet.http.HttpServletRequest;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.mocka.model.MockEndpointSettings;
 import org.mocka.service.MockService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,8 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Api(tags = "Mock management")
 @RestController
@@ -22,54 +24,73 @@ public class MockController {
     private final MockService service;
 
 
+    @GetMapping(value = "/server/{mockServerId}")
+    public ResponseEntity<Object> getMockServer(
+        @PathVariable UUID mockServerId) {
+        return ResponseEntity.ok(null); // todo
+    }
+
     @PostMapping(value = "/server")
-    public ResponseEntity<Void> createMockServer(HttpServletRequest request) {
-        var mockServerId = service.createMockServer();
+    public ResponseEntity<Void> createMockServer(
+        @RequestParam(required = false, defaultValue = "false") boolean stub) {
+        var mockServerId = service.createMockServer(stub);
         return ResponseEntity
-            .created(UriComponentsBuilder
-                .fromUriString(request.getRequestURI())
+            .created(ServletUriComponentsBuilder
+                .fromCurrentRequestUri()
                 .path("/{mockServerId}")
                 .build(mockServerId))
             .build();
     }
 
-    @GetMapping(value = "/method/{id}")
-    public ResponseEntity<Void> get(@PathVariable Integer id) {
-        return ResponseEntity.noContent().build(); // todo
-    }
-
-    @PostMapping(value = "/method", consumes = "application/json")
-    public ResponseEntity<Void> create(@RequestBody Object payload) {
-        return ResponseEntity.noContent().build(); // todo
-    }
-
-    @PutMapping(value = "/method/{id}", consumes = "application/json")
-    public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody Object payload) {
-        return ResponseEntity.noContent().build(); // todo
-    }
-
-    @DeleteMapping(value = "/method/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+    @DeleteMapping(value = "/server/{mockServerId}")
+    public ResponseEntity<Void> deleteMockServer(
+        @PathVariable UUID mockServerId) {
         return ResponseEntity.noContent().build(); // todo
     }
 
 
-    @GetMapping(value = "/method/{id}/script", produces = "text/javascript")
-    public ResponseEntity<String> getScript(@PathVariable String id) {
-        var script = service.getScript(id);
+    @GetMapping(value = "/server/{mockServerId}/method/{mockEndpointId}")
+    public ResponseEntity<Object> getMockEndpoint(
+        @PathVariable UUID mockServerId,
+        @PathVariable UUID mockEndpointId) {
+        return ResponseEntity.ok(null); // todo
+    }
+
+    @PostMapping(value = "/server/{mockServerId}/method")
+    public ResponseEntity<Void> createMockEndpoint(
+        @PathVariable UUID mockServerId,
+        @RequestBody MockEndpointSettings settings) {
+        var mockEndpointId = service.createMockEndpoint(mockServerId, settings);
+        return ResponseEntity
+            .created(ServletUriComponentsBuilder
+                .fromCurrentRequestUri()
+                .path("/{mockEndpointId}")
+                .build(mockEndpointId))
+            .build();
+    }
+
+    @DeleteMapping(value = "/server/{mockServerId}/method/{mockEndpointId}")
+    public ResponseEntity<Void> deleteMockEndpoint(
+        @PathVariable UUID mockServerId,
+        @PathVariable UUID mockEndpointId) {
+        return ResponseEntity.noContent().build(); // todo
+    }
+
+
+    @GetMapping(value = "/server/{mockServerId}/method/{mockEndpointId}/script", produces = "text/javascript")
+    public ResponseEntity<String> getScript(
+        @PathVariable UUID mockServerId,
+        @PathVariable UUID mockEndpointId) {
+        var script = service.getScript(mockServerId, mockEndpointId);
         return ResponseEntity.ok(script);
     }
 
-    @PutMapping(value = "/method/{id}/script", consumes = {"application/javascript", "application/ecmascript", "text/javascript", "text/ecmascript"})
-    public ResponseEntity<Void> uploadScript(@PathVariable String id, @RequestBody String script) {
-        service.uploadScript(id, script);
+    @PutMapping(value = "/server/{mockServerId}/method/{mockEndpointId}/script", consumes = "text/javascript")
+    public ResponseEntity<Void> uploadScript(
+        @PathVariable UUID mockServerId,
+        @PathVariable UUID mockEndpointId,
+        @RequestBody String script) {
+        service.uploadScript(mockServerId, mockEndpointId, script);
         return ResponseEntity.noContent().build();
-    }
-
-
-    @GetMapping(value = "/script/sample", produces = "text/javascript")
-    public ResponseEntity<String> getSample() {
-        var sample = service.getSample();
-        return ResponseEntity.ok(sample);
     }
 }

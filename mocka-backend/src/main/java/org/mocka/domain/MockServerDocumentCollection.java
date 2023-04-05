@@ -1,5 +1,8 @@
 package org.mocka.domain;
 
-public interface MockServerDocumentCollection extends MongoDocumentCollection<MockServerDocument> {
+import java.util.UUID;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+public interface MockServerDocumentCollection extends MongoRepository<MockServerDocument, UUID> {
 
 }

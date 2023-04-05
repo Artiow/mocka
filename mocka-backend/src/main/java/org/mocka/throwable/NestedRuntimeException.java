@@ -1,11 +1,10 @@
 package org.mocka.throwable;
 
-import static org.mocka.util.MessageUtils.msg;
+import static org.mocka.util.FormatUtils.format;
 
 public abstract class NestedRuntimeException extends RuntimeException {
 
-    public NestedRuntimeException() {
-    }
+    public NestedRuntimeException() { }
 
     public NestedRuntimeException(String message) {
         super(message);
@@ -16,22 +15,22 @@ public abstract class NestedRuntimeException extends RuntimeException {
     }
 
     public NestedRuntimeException(String format, Object... args) {
-        this(msg(format, args));
+        this(format(format, args));
     }
 
     public NestedRuntimeException(String format, Object arg, Throwable cause) {
-        this(msg(format, arg), cause);
+        this(format(format, arg), cause);
     }
 
     public NestedRuntimeException(String format, Object arg1, Object arg2, Throwable cause) {
-        this(msg(format, arg1, arg2), cause);
+        this(format(format, arg1, arg2), cause);
     }
 
     public NestedRuntimeException(String format, Object arg1, Object arg2, Object arg3, Throwable cause) {
-        this(msg(format, arg1, arg2, arg3), cause);
+        this(format(format, arg1, arg2, arg3), cause);
     }
 
     public NestedRuntimeException(String format, Object[] args, Throwable cause) {
-        this(msg(format, args), cause);
+        this(format(format, args), cause);
     }
 }

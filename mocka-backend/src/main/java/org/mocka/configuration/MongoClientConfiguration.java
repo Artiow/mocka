@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.UuidRepresentation;
 import org.bson.types.ObjectId;
 import org.mocka.properties.MongoProperties;
 import org.mocka.properties.MongoProperties.Credentials;
@@ -48,6 +49,7 @@ public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
     @Override
     protected void configureClientSettings(MongoClientSettings.Builder builder) {
         builder.applyConnectionString(new ConnectionString(mongo.getUrl()));
+        builder.uuidRepresentation(UuidRepresentation.STANDARD);
         var credentials = Optional.ofNullable(mongo.getCredentials());
         var username = credentials.map(Credentials::getUsername);
         var password = credentials.map(Credentials::getPassword).map(String::toCharArray);

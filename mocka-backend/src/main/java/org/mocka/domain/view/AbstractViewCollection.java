@@ -11,8 +11,8 @@ public abstract class AbstractViewCollection<E>
     private final MongoTemplate mongoTemplate;
 
 
-    public AbstractViewCollection(MongoTemplate mongoTemplate) {
-        super(mongoTemplate);
+    public AbstractViewCollection(Class<E> viewClass, MongoTemplate mongoTemplate) {
+        super(viewClass, mongoTemplate);
         this.mongoTemplate = mongoTemplate;
     }
 

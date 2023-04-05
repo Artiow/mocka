@@ -1,7 +1,8 @@
 package org.mocka.domain.view;
 
+import java.util.List;
+import java.util.UUID;
 import lombok.Getter;
-import org.bson.types.ObjectId;
 
 @Getter
 @View(viewName = "endpoint", viewOn = "server")
@@ -14,14 +15,14 @@ public class EndpointView {
     @Getter
     public static class Server {
 
-        private ObjectId id;
+        private UUID id;
     }
 
     @Getter
     public static class Endpoint {
 
-        private ObjectId id;
+        private UUID id;
         private String method;
-        private String path;
+        private List<String> path;
     }
 }
