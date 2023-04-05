@@ -33,7 +33,7 @@ public class MockService {
         try {
             var mockServer = MockServerDocument.builder().completeAndBuild();
             if (stub && Arrays.asList(env.getActiveProfiles()).contains("local")) {
-                // stub mock server has empty uuid for ease of testing
+                // mock server stub has empty uuid for ease of testing
                 mockServer.setId(UuidUtils.emptyUuid());
             }
             var mockEndpointId = addMockEndpointTo(mockServer, MockEndpointSettings.DEFAULT);
