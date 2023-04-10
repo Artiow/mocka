@@ -31,6 +31,8 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequiredArgsConstructor
 public class EndpointController {
 
+    private static final Pattern PREFIX_PATTERN = Pattern.compile("/mock/[^/]*/");
+
     private final EndpointService service;
 
 
@@ -41,7 +43,7 @@ public class EndpointController {
         HttpServletRequest request,
         @PathVariable UUID mockServerId,
         @RequestParam Map<String, Object> params) {
-        var forwardedRequest = new ForwardedHttpServletRequest(request, Pattern.compile("/mock/[^/]*/"), "/");
+        var forwardedRequest = new ForwardedHttpServletRequest(request, PREFIX_PATTERN, "/");
         return service.handle(forwardedRequest, mockServerId, params);
     }
 

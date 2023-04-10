@@ -8,11 +8,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.mocka.domain.MockEndpointEmbeddedDocument;
+import org.mocka.domain.MockEndpointPathEmbeddedDocument;
 import org.mocka.domain.MockServerDocument;
 import org.mocka.domain.MockServerDocumentCollection;
 import org.mocka.model.MockEndpointSettings;
 import org.mocka.storage.ScriptStorage;
 import org.mocka.storage.ScriptStorageException;
+import org.mocka.util.PathTemplateParser;
 import org.mocka.util.UuidUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -62,24 +64,25 @@ public class MockService {
     private UUID addMockEndpointTo(MockServerDocument mockServer, MockEndpointSettings settings) {
         // todo: check mock endpoint uniqueness
 
+        var parseResult = PathTemplateParser.parse(settings.getPathTemplate());
+
+        var path = MockEndpointPathEmbeddedDocument
+            .builder()
+            .template(parseResult.getSourcePathTemplate())
+            .regex(parseResult.getResultPathRegex())
+            .keys(parseResult.getKeys())
+            .completeAndBuild();
+
         var mockEndpoint = MockEndpointEmbeddedDocument
             .builder()
             .method(settings.getMethod())
-            .path(settings.getPath())
+            .path(path)
             .completeAndBuild();
 
         mockServer.getEndpoints().add(mockEndpoint);
         return mockEndpoint.getId();
     }
 
-
-    public String getSample() {
-        try (var scriptStream = storage.getSample()) {
-            return IOUtils.toString(scriptStream, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new MockServiceException("Exception occurred while sample getting", e);
-        }
-    }
 
     @Transactional(readOnly = true)
     public String getScript(UUID mockServerId, UUID mockEndpointId) {

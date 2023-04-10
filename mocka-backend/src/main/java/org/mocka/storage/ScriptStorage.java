@@ -85,6 +85,7 @@ public class ScriptStorage {
             putScript(sample, name);
         } catch (IOException e) {
             // todo: handle an exception that occurs when stream closing
+            throw new RuntimeException(e);
         }
     }
 

@@ -1,7 +1,5 @@
 package org.mocka.domain;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +13,7 @@ public class MockEndpointEmbeddedDocument {
 
     private UUID id;
     private HttpMethod method;
-    private List<String> path;
+    private MockEndpointPathEmbeddedDocument path;
 
 
     @SuppressWarnings("unused")
@@ -26,7 +24,7 @@ public class MockEndpointEmbeddedDocument {
                 this.id(UUID.randomUUID());
             }
             if (this.path == null) {
-                this.path(new ArrayList<>());
+                this.path(MockEndpointPathEmbeddedDocument.builder().completeAndBuild());
             }
             return this;
         }
