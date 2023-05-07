@@ -16,8 +16,12 @@ public class JSObjectFactory {
     private final JSObject arrayConstructor;
 
 
+    public static JSObjectFactory evaluated(ScriptEngine engine) throws ScriptException {
+        return evaluator(engine).evaluate();
+    }
+
     public static JSObjectFactory.Evaluator evaluator(ScriptEngine engine) {
-        return new JSObjectFactory.Evaluator(engine);
+        return new JSObjectFactory.Evaluator(engine, new SimpleScriptContext());
     }
 
 
@@ -34,9 +38,9 @@ public class JSObjectFactory {
     public static class Evaluator implements ThrowingSupplier<JSObjectFactory> {
 
         private static final String SCRIPT = "Object({objectConstructor: Object, arrayConstructor: Array})";
-        private static final ScriptContext CONTEXT = new SimpleScriptContext();
 
         private final ScriptEngine engine;
+        private final ScriptContext context;
 
 
         @Override
@@ -45,7 +49,7 @@ public class JSObjectFactory {
         }
 
         public JSObjectFactory evaluate() throws ScriptException {
-            var jsObjectFactory = (JSObject) engine.eval(SCRIPT, CONTEXT);
+            var jsObjectFactory = (JSObject) engine.eval(SCRIPT, context);
             return new JSObjectFactory(
                 (JSObject) jsObjectFactory.getMember("objectConstructor"),
                 (JSObject) jsObjectFactory.getMember("arrayConstructor")

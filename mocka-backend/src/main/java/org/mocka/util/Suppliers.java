@@ -7,7 +7,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Suppliers {
 
-    public static <T> SneakySupplier<T> sneaky(ThrowingSupplier<T> supplier) {
+    public static <T> Supplier<T> sneaky(ThrowingSupplier<T> supplier) {
         return new SneakySupplier<>(supplier);
     }
 

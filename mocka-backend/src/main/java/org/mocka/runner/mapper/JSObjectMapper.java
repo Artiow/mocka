@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.Map;
 import javax.script.ScriptEngine;
-import org.mocka.util.Suppliers;
+import javax.script.ScriptException;
 import org.openjdk.nashorn.api.scripting.JSObject;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
@@ -16,13 +16,13 @@ public class JSObjectMapper {
     private final static TypeReference<Map<String, Object>> OBJECT_TYPE_REFERENCE = new TypeReference<>() { };
     private final static TypeReference<Collection<Object>> ARRAY_TYPE_REFERENCE = new TypeReference<>() { };
 
+    private final JSObjectFactory jsObjectFactory;
     private final ObjectMapper objectMapper;
-    private final ThreadLocal<JSObjectFactory> jsObjectFactoryThreadLocal;
 
 
-    public JSObjectMapper(ObjectMapper objectMapper, ScriptEngine engine) {
+    public JSObjectMapper(ObjectMapper objectMapper, ScriptEngine engine) throws ScriptException {
+        this.jsObjectFactory = JSObjectFactory.evaluated(engine);
         this.objectMapper = objectMapper;
-        this.jsObjectFactoryThreadLocal = ThreadLocal.withInitial(Suppliers.sneaky(JSObjectFactory.evaluator(engine)));
     }
 
 
@@ -33,10 +33,6 @@ public class JSObjectMapper {
             return buildValue(toRaw(obj));
         } catch (Exception e) {
             throw new JSObjectMapperException("Exception occurred while object mapping", e);
-        } finally {
-            // todo: Create pool of JSObjectFactory instances
-            //       to prevent JSObjectFactory evaluating per thread.
-            discardJSObjectFactory();
         }
     }
 
@@ -85,18 +81,10 @@ public class JSObjectMapper {
 
 
     private JSObject newObject() {
-        return getJSObjectFactory().newObject();
+        return jsObjectFactory.newObject();
     }
 
     private JSObject newArray() {
-        return getJSObjectFactory().newArray();
-    }
-
-    private JSObjectFactory getJSObjectFactory() {
-        return jsObjectFactoryThreadLocal.get();
-    }
-
-    private void discardJSObjectFactory() {
-        jsObjectFactoryThreadLocal.remove();
+        return jsObjectFactory.newArray();
     }
 }
