@@ -2,76 +2,93 @@ package org.mocka.runner.mapper;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collection;
+import java.util.Map;
+import javax.script.ScriptEngine;
+import org.mocka.util.Suppliers;
 import org.openjdk.nashorn.api.scripting.JSObject;
 import org.springframework.stereotype.Service;
-
-import javax.script.ScriptEngine;
-import java.util.Collections;
-import java.util.Map;
+import org.springframework.util.ClassUtils;
 
 @Service
 public class JSObjectMapper {
 
     private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private final static TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<>() { };
+    private final static TypeReference<Map<String, Object>> OBJECT_TYPE_REFERENCE = new TypeReference<>() { };
+    private final static TypeReference<Collection<Object>> ARRAY_TYPE_REFERENCE = new TypeReference<>() { };
 
-    private final JSObjectFactory.Evaluator factoryEvaluator;
+    private final ThreadLocal<JSObjectFactory> jsObjectFactoryThreadLocal;
 
 
     public JSObjectMapper(ScriptEngine engine) {
-        this.factoryEvaluator = JSObjectFactory.evaluator(engine);
+        this.jsObjectFactoryThreadLocal = ThreadLocal.withInitial(Suppliers.sneaky(JSObjectFactory.evaluator(engine)));
     }
 
 
-    public synchronized JSObject map(Object obj) throws JSObjectMapperException {
+    private static Object toRaw(Object obj) {
+        if (isValue(obj)) return obj; // ready to use
+        if (isArray(obj)) return toRawArray(obj);
+        return toRawObject(obj);
+    }
+
+    private static Map<String, Object> toRawObject(Object obj) throws IllegalArgumentException {
+        return OBJECT_MAPPER.convertValue(obj, OBJECT_TYPE_REFERENCE);
+    }
+
+    private static Collection<Object> toRawArray(Object obj) throws IllegalArgumentException {
+        return OBJECT_MAPPER.convertValue(obj, ARRAY_TYPE_REFERENCE);
+    }
+
+
+    private static boolean isValue(Object obj) {
+        return obj == null || ClassUtils.isPrimitiveWrapper(obj.getClass());
+    }
+
+    private static boolean isArray(Object obj) {
+        return obj instanceof Collection || obj.getClass().isArray();
+    }
+
+
+    // todo: Turn mapper to Jackson deserializer, make extends
+    //       com.fasterxml.jackson.databind.deser.std.ContainerDeserializerBase.
+    public Object map(Object obj) throws JSObjectMapperException {
         try {
-            var rawObj = createRaw(obj);
-            // todo: create and use ready thread-safe JSObjectFactory
-            return buildJSObject(rawObj, factoryEvaluator.eval());
+            return buildValue(toRaw(obj));
         } catch (Exception e) {
             throw new JSObjectMapperException("Exception occurred while object mapping", e);
         }
     }
 
 
-    private Map<String, Object> createRaw(Object obj) {
-        return isValue(obj)
-                ? Collections.singletonMap("value", obj)
-                : OBJECT_MAPPER.convertValue(obj, MAP_TYPE_REFERENCE);
+    @SuppressWarnings("unchecked")
+    private Object buildValue(Object v) {
+        if (v instanceof Map) return buildObjectValue((Map<String, Object>) v);
+        if (v instanceof Collection) return buildArrayValue((Collection<Object>) v);
+        return v; // ready to use
     }
 
-    private JSObject buildJSObject(Map<?, ?> rawObj, JSObjectFactory jsObjectFactory) {
-        var jsObject = jsObjectFactory.newObject();
-        rawObj.forEach((k, v) -> {
-            validateMapKey(k);
-            validateMapValue(v);
-            jsObject.setMember(
-                    (String) k,
-                    isObject(v) ? buildJSObject((Map<?, ?>) v, jsObjectFactory) : v
-            );
-        });
+    private JSObject buildObjectValue(Map<String, Object> rawObjectValue) {
+        var jsObject = newObject();
+        rawObjectValue.forEach((key, value) -> jsObject.setMember(key, buildValue(value)));
+        return jsObject;
+    }
+
+    private JSObject buildArrayValue(Collection<Object> rawArrayValue) {
+        var jsObject = newArray();
+        int index = 0; for (var element : rawArrayValue) { jsObject.setSlot(index++, buildValue(element)); }
         return jsObject;
     }
 
 
-    private void validateMapKey(Object key) {
-        if (!(key instanceof String)) {
-            throw new IllegalArgumentException(String.format("Key type \"%s\" is unacceptable", key.getClass().getName()));
-        }
+    private JSObject newObject() {
+        return getJSObjectFactory().newObject();
     }
 
-    private void validateMapValue(Object value) {
-        if (!(isValue(value) || isObject(value))) {
-            throw new IllegalArgumentException(String.format("Value type \"%s\" is unacceptable", value.getClass().getName()));
-        }
+    private JSObject newArray() {
+        return getJSObjectFactory().newArray();
     }
 
-
-    private boolean isValue(Object value) {
-        return value == null || value.getClass().isPrimitive() || value instanceof String;
-    }
-
-    private boolean isObject(Object value) {
-        return value instanceof Map;
+    private JSObjectFactory getJSObjectFactory() {
+        return jsObjectFactoryThreadLocal.get();
     }
 }

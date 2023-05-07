@@ -1,8 +1,5 @@
 package org.mocka.service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.PathMatcher;
 
 @Slf4j
 @Service
@@ -27,18 +25,15 @@ public class EndpointService {
 
     private static final String ENTRYPOINT = "main";
 
+    private final PathMatcher pathMatcher;
     private final EndpointViewCollection endpointViewCollection;
     private final ScriptStorage scriptStorage;
     private final ScriptRunner scriptRunner;
 
 
-    public ResponseEntity<Object> handle(
-        HttpServletRequest request,
-        UUID mockServerId,
-        Map<String, Object> params
-    ) {
+    public ResponseEntity<Object> handle(UUID mockServerId, HttpServletRequest request) {
         var requestMethod = HttpMethod.resolve(request.getMethod());
-        var requestPath = Collections.<String>emptyList();
+        var requestPath = request.getRequestURI();
 
         var endpoint = findEndpoint(mockServerId, requestMethod, requestPath);
         var mockEndpointId = endpoint.getEndpoint().getId();
@@ -49,7 +44,7 @@ public class EndpointService {
         scriptRequest.setMethod(request.getMethod());
         scriptRequest.setUrl(request.getRequestURL().toString());
         scriptRequest.setUri(request.getRequestURI());
-        scriptRequest.setRequestParams(params);
+        scriptRequest.setRequestParams(request.getParameterMap());
         try {
             var scriptResponse = scriptRunner.run(
                 scriptStorage.getScript(mockEndpointId.toString()),
@@ -66,11 +61,20 @@ public class EndpointService {
     public EndpointView findEndpoint(
         UUID mockServerId,
         HttpMethod requestMethod,
-        List<String> requestPath
+        String requestPath
     ) {
         var query = new Query();
         query.addCriteria(Criteria.where("server.id").is(mockServerId));
         query.addCriteria(Criteria.where("endpoint.method").is(requestMethod));
-        return endpointViewCollection.find(query).get(0); // todo endpoint search
+        var candidates = endpointViewCollection.find(query);
+        return candidates
+            .stream()
+            .filter(e -> match(e, requestPath))
+            .findFirst()
+            .orElseThrow(RuntimeException::new); // todo: 404
+    }
+
+    public boolean match(EndpointView e, String requestPath) {
+        return pathMatcher.match(e.getEndpoint().getPathPattern(), requestPath);
     }
 }

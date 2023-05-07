@@ -12,10 +12,10 @@ public class MockEndpointSettings {
 
     public final static MockEndpointSettings DEFAULT = MockEndpointSettings.builder()
         .method(HttpMethod.GET)
-        .pathTemplate("/")
+        .pathPattern("/**")
         .build();
 
 
     private HttpMethod method;
-    private String pathTemplate;
+    private String pathPattern;
 }

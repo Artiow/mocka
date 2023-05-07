@@ -15,5 +15,5 @@ public class ScriptRequest {
     private String method;
     private String url;
     private String uri;
-    private Map<String, Object> requestParams;
+    private Map<String, String[]> requestParams;
 }

@@ -13,7 +13,7 @@ public class MockEndpointEmbeddedDocument {
 
     private UUID id;
     private HttpMethod method;
-    private MockEndpointPathEmbeddedDocument path;
+    private String pathPattern;
 
 
     @SuppressWarnings("unused")
@@ -22,9 +22,6 @@ public class MockEndpointEmbeddedDocument {
         private MockEndpointEmbeddedDocumentBuilder complete() {
             if (this.id == null) {
                 this.id(UUID.randomUUID());
-            }
-            if (this.path == null) {
-                this.path(MockEndpointPathEmbeddedDocument.builder().completeAndBuild());
             }
             return this;
         }

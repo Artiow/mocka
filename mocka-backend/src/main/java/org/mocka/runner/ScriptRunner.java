@@ -26,9 +26,7 @@ public class ScriptRunner {
         ScriptRequest request
     ) throws ScriptRunnerException {
         try {
-            try (var reader = new InputStreamReader(scriptStream)) {
-                engine.eval(reader);
-            }
+            try (var reader = new InputStreamReader(scriptStream)) { engine.eval(reader); }
             var invocationResult = invokeEntrypoint(entrypoint, mapper.map(request));
             var scriptResponse = new ScriptResponse();
             scriptResponse.setStatus((Integer) invocationResult.getMember("status"));
@@ -39,7 +37,7 @@ public class ScriptRunner {
         }
     }
 
-    private JSObject invokeEntrypoint(String name, JSObject request) throws InvokeException {
+    private JSObject invokeEntrypoint(String name, Object request) throws InvokeException {
         Object response;
         try {
             response = ((Invocable) engine).invokeFunction(name, request);
