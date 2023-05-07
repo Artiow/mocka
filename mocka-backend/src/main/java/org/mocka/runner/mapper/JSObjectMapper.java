@@ -25,7 +25,7 @@ public class JSObjectMapper {
     }
 
 
-    private static Object toRaw(Object obj) {
+    private static Object toRaw(Object obj) throws IllegalArgumentException {
         if (isValue(obj)) return obj; // ready to use
         if (isArray(obj)) return toRawArray(obj);
         return toRawObject(obj);

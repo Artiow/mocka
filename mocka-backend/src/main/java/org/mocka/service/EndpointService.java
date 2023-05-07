@@ -1,5 +1,6 @@
 package org.mocka.service;
 
+import java.util.Map;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,8 @@ public class EndpointService {
         scriptRequest.setUrl(request.getRequestURL().toString());
         scriptRequest.setUri(request.getRequestURI());
         scriptRequest.setRequestParams(request.getParameterMap());
+        scriptRequest.setPathVars(extractPathVars(endpoint, requestPath));
+
         try {
             var scriptResponse = scriptRunner.run(
                 scriptStorage.getScript(mockEndpointId.toString()),
@@ -74,7 +77,11 @@ public class EndpointService {
             .orElseThrow(RuntimeException::new); // todo: 404
     }
 
-    public boolean match(EndpointView e, String requestPath) {
+    private boolean match(EndpointView e, String requestPath) {
         return pathMatcher.match(e.getEndpoint().getPathPattern(), requestPath);
+    }
+
+    private Map<String, String> extractPathVars(EndpointView e, String requestPath) {
+        return pathMatcher.extractUriTemplateVariables(e.getEndpoint().getPathPattern(), requestPath);
     }
 }

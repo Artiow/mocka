@@ -77,7 +77,9 @@ public class MockController {
     }
 
 
-    @GetMapping(value = "/server/{mockServerId}/method/{mockEndpointId}/script", produces = "text/javascript")
+    @GetMapping(
+        value = "/server/{mockServerId}/method/{mockEndpointId}/script",
+        produces = "text/javascript")
     public ResponseEntity<String> getScript(
         @PathVariable UUID mockServerId,
         @PathVariable UUID mockEndpointId) {
@@ -85,12 +87,14 @@ public class MockController {
         return ResponseEntity.ok(script);
     }
 
-    @PutMapping(value = "/server/{mockServerId}/method/{mockEndpointId}/script", consumes = "text/javascript")
-    public ResponseEntity<Void> uploadScript(
+    @PutMapping(
+        value = "/server/{mockServerId}/method/{mockEndpointId}/script",
+        consumes = {"text/javascript", "text/ecmascript", "application/javascript", "application/ecmascript"})
+    public ResponseEntity<Void> putScript(
         @PathVariable UUID mockServerId,
         @PathVariable UUID mockEndpointId,
         @RequestBody String script) {
-        service.uploadScript(mockServerId, mockEndpointId, script);
+        service.putScript(mockServerId, mockEndpointId, script);
         return ResponseEntity.noContent().build();
     }
 }

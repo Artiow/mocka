@@ -85,7 +85,7 @@ public class MockService {
     }
 
     @Transactional(readOnly = true)
-    public void uploadScript(UUID mockServerId, UUID mockEndpointId, String script) {
+    public void putScript(UUID mockServerId, UUID mockEndpointId, String script) {
         // todo: check endpoint existence, script evaluation
         try (var scriptStream = IOUtils.toInputStream(script, StandardCharsets.UTF_8)) {
             storage.putScript(scriptStream, mockEndpointId.toString());
