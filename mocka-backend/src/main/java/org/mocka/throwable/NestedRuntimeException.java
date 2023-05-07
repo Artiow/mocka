@@ -1,6 +1,6 @@
 package org.mocka.throwable;
 
-import static org.mocka.util.FormatUtils.format;
+import static org.mocka.util.Formatter.format;
 
 public abstract class NestedRuntimeException extends RuntimeException {
 

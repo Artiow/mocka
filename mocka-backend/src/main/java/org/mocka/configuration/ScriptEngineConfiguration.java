@@ -1,12 +1,13 @@
 package org.mocka.configuration;
 
+import static org.mocka.util.Formatter.format;
+
+import javax.script.ScriptEngine;
 import lombok.RequiredArgsConstructor;
 import org.mocka.properties.ScriptEngineProperties;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.script.ScriptEngine;
 
 @Configuration
 @RequiredArgsConstructor
@@ -16,8 +17,6 @@ public class ScriptEngineConfiguration {
 
     @Bean
     public ScriptEngine scriptEngine() {
-        return new NashornScriptEngineFactory().getScriptEngine(
-                String.format("--language=%s", scriptEngine.getVersion())
-        );
+        return new NashornScriptEngineFactory().getScriptEngine(format("--language={}", scriptEngine.getVersion()));
     }
 }
