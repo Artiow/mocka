@@ -1,4 +1,4 @@
-package org.mocka.runner.mapper;
+package org.mocka.runner.marshaller;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;

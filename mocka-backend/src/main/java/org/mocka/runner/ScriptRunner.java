@@ -5,7 +5,7 @@ import java.io.InputStreamReader;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import lombok.RequiredArgsConstructor;
-import org.mocka.runner.mapper.JSObjectMapper;
+import org.mocka.runner.marshaller.JSObjectMarshaller;
 import org.mocka.runner.model.ScriptRequest;
 import org.mocka.runner.model.ScriptResponse;
 import org.openjdk.nashorn.api.scripting.JSObject;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class ScriptRunner {
 
     private final ScriptEngine engine;
-    private final JSObjectMapper mapper;
+    private final JSObjectMarshaller marshaller;
 
 
     //todo: make thread-safe
@@ -27,7 +27,7 @@ public class ScriptRunner {
     ) throws ScriptRunnerException {
         try {
             try (var reader = new InputStreamReader(scriptStream)) { engine.eval(reader); }
-            var invocationResult = invokeEntrypoint(entrypoint, mapper.map(request));
+            var invocationResult = invokeEntrypoint(entrypoint, marshaller.marshall(request));
             var scriptResponse = new ScriptResponse();
             scriptResponse.setStatus((Integer) invocationResult.getMember("status"));
             scriptResponse.setBody(invocationResult.getMember("body"));

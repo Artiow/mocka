@@ -1,4 +1,4 @@
-package org.mocka.runner.mapper;
+package org.mocka.runner.marshaller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -57,7 +57,7 @@ import org.springframework.util.ClassUtils;
 @TestMethodOrder(OrderAnnotation.class)
 @SpringBootTest(classes = {ObjectMapper.class, ScriptEngineConfiguration.class})
 @EnableConfigurationProperties(value = {ScriptEngineProperties.class})
-public class JSObjectMapperTest {
+public class JSObjectMarshallerTest {
 
     private static final Supplier<Stopwatch> SW_PROVIDER = Stopwatches::wall;
 
@@ -66,19 +66,22 @@ public class JSObjectMapperTest {
     @Autowired
     private ScriptEngine scriptEngine;
 
-    private JSObjectMapper jsObjectMapper;
+    private JSObjectMarshaller marshaller;
 
 
     @BeforeEach
     public void setup() throws ScriptException {
-        jsObjectMapper = new JSObjectMapper(objectMapper, scriptEngine);
+        marshaller = new JSObjectMarshaller(objectMapper, scriptEngine);
     }
 
 
     @Test
     @Order(0)
     public void warmUp() throws Exception {
+        doMultithreadingTest(1, () -> generateTestPojo(1), SW_PROVIDER);
         doMultithreadingTest(1, () -> generateTestArray(1), SW_PROVIDER);
+        doMultithreadingTest(1, () -> generateTestCollection(1), SW_PROVIDER);
+        doMultithreadingTest(1, () -> generateTestMap(1), SW_PROVIDER);
     }
 
     @Test
@@ -134,7 +137,7 @@ public class JSObjectMapperTest {
         Supplier<Object> sourceGenerator
     ) throws Exception {
         var source = sourceGenerator.get();
-        var result = jsObjectMapper.map(source);
+        var result = marshaller.marshall(source);
         doAssertEquals(source, result);
     }
 
@@ -152,7 +155,7 @@ public class JSObjectMapperTest {
             sourceMap.put(key, source);
             latchRunner.addMeasuredTest("TestThread-" + key, sw -> {
                 sw.start();
-                final var result = jsObjectMapper.map(source);
+                final var result = marshaller.marshall(source);
                 sw.stop();
                 resultMap.put(key, result);
             });

@@ -1,4 +1,4 @@
-package org.mocka.runner.mapper;
+package org.mocka.runner.marshaller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
 
 @Service
-public class JSObjectMapper {
+public class JSObjectMarshaller {
 
     private final static TypeReference<Map<String, Object>> OBJECT_TYPE_REFERENCE = new TypeReference<>() { };
     private final static TypeReference<Collection<Object>> ARRAY_TYPE_REFERENCE = new TypeReference<>() { };
@@ -20,7 +20,7 @@ public class JSObjectMapper {
     private final ObjectMapper objectMapper;
 
 
-    public JSObjectMapper(ObjectMapper objectMapper, ScriptEngine engine) throws ScriptException {
+    public JSObjectMarshaller(ObjectMapper objectMapper, ScriptEngine engine) throws ScriptException {
         this.jsObjectFactory = JSObjectFactory.evaluated(engine);
         this.objectMapper = objectMapper;
     }
@@ -28,11 +28,11 @@ public class JSObjectMapper {
 
     // todo: Turn mapper into Jackson deserializer, make extends
     //       com.fasterxml.jackson.databind.deser.std.ContainerDeserializerBase.
-    public Object map(Object obj) throws JSObjectMapperException {
+    public Object marshall(Object obj) throws JSObjectMarshallingException {
         try {
             return buildValue(toRaw(obj));
         } catch (Exception e) {
-            throw new JSObjectMapperException("Exception occurred while object mapping", e);
+            throw new JSObjectMarshallingException("Exception occurred while object mapping", e);
         }
     }
 
