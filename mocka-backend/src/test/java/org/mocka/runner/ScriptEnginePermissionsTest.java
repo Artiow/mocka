@@ -7,7 +7,6 @@ import java.io.IOException;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.MethodOrderer.MethodName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@Slf4j
 @TestMethodOrder(MethodName.class)
 @SpringBootTest(classes = {ScriptEngineConfiguration.class})
 @EnableConfigurationProperties(value = {ScriptEngineProperties.class})

@@ -11,15 +11,11 @@ import org.springframework.util.ResourceUtils;
 public class ResourceFileUtils {
 
     public static InputStreamReader read(String resourceLocationFormat, Object... args) throws IOException {
-        try (final var stream = open(resourceLocationFormat, args)) {
-            return new InputStreamReader(stream);
-        }
+        return new InputStreamReader(open(resourceLocationFormat, args));
     }
 
     public static InputStreamReader read(String resourceLocation) throws IOException {
-        try (final var stream = open(resourceLocation)) {
-            return new InputStreamReader(stream);
-        }
+        return new InputStreamReader(open(resourceLocation));
     }
 
     public static InputStream open(String resourceLocationFormat, Object... args) throws IOException {
