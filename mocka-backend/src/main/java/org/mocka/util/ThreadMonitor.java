@@ -45,6 +45,7 @@ public class ThreadMonitor {
         return threadCpuTime;
     }
 
+
     private void checkValue(long value) {
         if (value == -1) {
             throw new IllegalStateException(Formatter.format(

@@ -59,8 +59,6 @@ import org.springframework.util.ClassUtils;
 @EnableConfigurationProperties(value = {ScriptEngineProperties.class})
 public class JSObjectMarshallerTest {
 
-    private static final Supplier<Stopwatch> SW_PROVIDER = Stopwatches::wall;
-
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -78,58 +76,59 @@ public class JSObjectMarshallerTest {
     @Test
     @Order(0)
     public void warmUp() throws Exception {
-        doMultithreadingTest(1, () -> generateTestPojo(1), SW_PROVIDER);
-        doMultithreadingTest(1, () -> generateTestArray(1), SW_PROVIDER);
-        doMultithreadingTest(1, () -> generateTestCollection(1), SW_PROVIDER);
-        doMultithreadingTest(1, () -> generateTestMap(1), SW_PROVIDER);
+        doMultithreadingTest(1, () -> generateTestPojo(1));
+        doMultithreadingTest(1, () -> generateTestArray(1));
+        doMultithreadingTest(1, () -> generateTestCollection(1));
+        doMultithreadingTest(1, () -> generateTestMap(1));
     }
+
 
     @Test
     @Order(1)
     public void test_pojo() throws Exception {
-        doTest(() -> generateTestPojo(1));
+        doTest(() -> generateTestPojo(4));
     }
 
     @Test
     @Order(2)
     public void test_array() throws Exception {
-        doTest(() -> generateTestArray(1));
+        doTest(() -> generateTestArray(4));
     }
 
     @Test
     @Order(3)
     public void test_collection() throws Exception {
-        doTest(() -> generateTestCollection(1));
+        doTest(() -> generateTestCollection(4));
     }
 
     @Test
     @Order(4)
     public void test_map() throws Exception {
-        doTest(() -> generateTestMap(1));
+        doTest(() -> generateTestMap(4));
     }
 
     @Test
     @Order(5)
     public void multithreadingTest_pojo() throws Exception {
-        doMultithreadingTest(1000, () -> generateTestPojo(2), SW_PROVIDER);
+        doMultithreadingTest(1000, () -> generateTestPojo(2));
     }
 
     @Test
     @Order(6)
     public void multithreadingTest_array() throws Exception {
-        doMultithreadingTest(1000, () -> generateTestArray(2), SW_PROVIDER);
+        doMultithreadingTest(1000, () -> generateTestArray(2));
     }
 
     @Test
     @Order(7)
     public void multithreadingTest_collection() throws Exception {
-        doMultithreadingTest(1000, () -> generateTestCollection(2), SW_PROVIDER);
+        doMultithreadingTest(1000, () -> generateTestCollection(2));
     }
 
     @Test
     @Order(8)
     public void multithreadingTest_map() throws Exception {
-        doMultithreadingTest(1000, () -> generateTestMap(2), SW_PROVIDER);
+        doMultithreadingTest(1000, () -> generateTestMap(2));
     }
 
 
@@ -139,6 +138,13 @@ public class JSObjectMarshallerTest {
         var source = sourceGenerator.get();
         var result = marshaller.marshall(source);
         doAssertEquals(source, result);
+    }
+
+    private void doMultithreadingTest(
+        int numberOfIterations,
+        Supplier<Object> sourceGenerator
+    ) throws Exception {
+        doMultithreadingTest(numberOfIterations, sourceGenerator, Stopwatches::wall);
     }
 
     private void doMultithreadingTest(
@@ -339,11 +345,12 @@ public class JSObjectMarshallerTest {
             .doubleArrayField(nextDoubleArray(32))
             .stringField(nextHexString(32));
         if (depth > 0) {
+            final int childDepth = depth - 1;
             builder
-                .objectField(generateTestPojo(depth - 1))
-                .arrayField(generateTestArray(depth - 1))
-                .collectionField(generateTestCollection(depth - 1))
-                .mapField(generateTestMap(depth - 1));
+                .objectField(generateTestPojo(childDepth))
+                .arrayField(generateTestArray(childDepth))
+                .collectionField(generateTestCollection(childDepth))
+                .mapField(generateTestMap(childDepth));
         }
         return builder.build();
     }
@@ -361,12 +368,12 @@ public class JSObjectMarshallerTest {
             nextHexString(32)
         };
         if (depth > 0) {
-            final var baseLength = array.length;
-            array = Arrays.copyOf(array, baseLength + 4);
-            array[baseLength + 0] = generateTestPojo(depth - 1);
-            array[baseLength + 1] = generateTestArray(depth - 1);
-            array[baseLength + 2] = generateTestCollection(depth - 1);
-            array[baseLength + 3] = generateTestMap(depth - 1);
+            final int childDepth = depth - 1;
+            array = Arrays.copyOf(array, array.length + 4);
+            array[array.length - 4] = generateTestPojo(childDepth);
+            array[array.length - 3] = generateTestArray(childDepth);
+            array[array.length - 2] = generateTestCollection(childDepth);
+            array[array.length - 1] = generateTestMap(childDepth);
         }
         return array;
     }
@@ -387,10 +394,11 @@ public class JSObjectMarshallerTest {
         map.put("doubleArrayKey", nextDoubleArray(32));
         map.put("stringKey", nextHexString(32));
         if (depth > 0) {
-            map.put("pojoKey", generateTestPojo(depth - 1));
-            map.put("arrayKey", generateTestArray(depth - 1));
-            map.put("collectionKey", generateTestCollection(depth - 1));
-            map.put("mapKey", generateTestMap(depth - 1));
+            final int childDepth = depth - 1;
+            map.put("pojoKey", generateTestPojo(childDepth));
+            map.put("arrayKey", generateTestArray(childDepth));
+            map.put("collectionKey", generateTestCollection(childDepth));
+            map.put("mapKey", generateTestMap(childDepth));
         }
         return Collections.unmodifiableMap(map);
     }
