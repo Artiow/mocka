@@ -17,6 +17,9 @@ public class ScriptEngineConfiguration {
 
     @Bean
     public ScriptEngine scriptEngine() {
-        return new NashornScriptEngineFactory().getScriptEngine(format("--language={}", scriptEngine.getVersion()));
+        return new NashornScriptEngineFactory().getScriptEngine(
+            format("--language={}", scriptEngine.getVersion()),
+            "--no-syntax-extensions",
+            "--no-java");
     }
 }

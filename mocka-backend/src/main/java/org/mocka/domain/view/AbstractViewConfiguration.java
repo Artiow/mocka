@@ -1,7 +1,5 @@
 package org.mocka.domain.view;
 
-import static org.mocka.util.Formatter.format;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoDatabase;
@@ -58,7 +56,7 @@ public abstract class AbstractViewConfiguration<E> {
 
     @SneakyThrows(IOException.class)
     private List<Map<String, Object>> getPipeline() {
-        try (var jsonStream = ResourceFileUtils.open(format("classpath:view/{}.json", getViewName()))) {
+        try (var jsonStream = ResourceFileUtils.open("classpath:view/{}.json", getViewName())) {
             return readPipeline(jsonStream);
         }
     }

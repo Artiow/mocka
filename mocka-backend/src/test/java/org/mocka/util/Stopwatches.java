@@ -2,8 +2,6 @@ package org.mocka.util;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Ticker;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
 
@@ -21,25 +19,21 @@ public class Stopwatches {
 
     private static class CpuTicker extends Ticker {
 
-        private final ThreadMXBean threadMXBean;
+        private final ThreadMonitor threadMonitor;
         private final Thread holderThread;
 
+
         public CpuTicker() {
-            this.threadMXBean = ManagementFactory.getThreadMXBean();
-            this.holderThread = Thread.currentThread();
+            final var currentThread = Thread.currentThread();
+            this.threadMonitor = new ThreadMonitor(currentThread);
+            this.holderThread = currentThread;
         }
+
 
         @Override
         public long read() {
             checkThread();
-            final long cpuTime = threadMXBean.getThreadCpuTime(holderThread.getId());
-            if (cpuTime == -1) {
-                throw new IllegalStateException(Formatter.format(
-                    "Current thread {} is not alive",
-                    holderThread.getName()
-                ));
-            }
-            return cpuTime;
+            return threadMonitor.getThreadCpuTime();
         }
 
         private void checkThread() {
@@ -50,8 +44,7 @@ public class Stopwatches {
                 throw new IllegalStateException(Formatter.format(
                     "CPU stopwatch can only be used within a single thread. Stopwatch holder thread: {}, current thread: {}",
                     holderThreadName,
-                    currentThreadName
-                ));
+                    currentThreadName));
             }
         }
     }
