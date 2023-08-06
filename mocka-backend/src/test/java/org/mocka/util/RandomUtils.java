@@ -1,5 +1,6 @@
 package org.mocka.util;
 
+import java.nio.ByteOrder;
 import java.security.SecureRandom;
 import java.util.Random;
 import lombok.experimental.UtilityClass;
@@ -124,6 +125,34 @@ public class RandomUtils {
         char[] chars = new char[length * 2];
         int i = 0;
         for (byte b : nextByteArray(length)) {
+            chars[i++] = HEX_CHARS[b >> 4 & 0x0f];
+            chars[i++] = HEX_CHARS[b & 0x0f];
+        }
+        return new String(chars);
+    }
+
+    public static String toHexLine(int value, ByteOrder order) {
+        if (order.equals(ByteOrder.BIG_ENDIAN)) {
+            return toHexLine(new byte[]{
+                (byte) ((value >> 24) & 0xff),
+                (byte) ((value >> 16) & 0xff),
+                (byte) ((value >> 8) & 0xff),
+                (byte) (value & 0xff)
+            });
+        } else {
+            return toHexLine(new byte[]{
+                (byte) (value & 0xff),
+                (byte) ((value >> 8) & 0xff),
+                (byte) ((value >> 16) & 0xff),
+                (byte) ((value >> 24 & 0xff))
+            });
+        }
+    }
+
+    public static String toHexLine(byte[] byteArray) {
+        final char[] chars = new char[byteArray.length * 2];
+        int i = 0;
+        for (byte b : byteArray) {
             chars[i++] = HEX_CHARS[b >> 4 & 0x0f];
             chars[i++] = HEX_CHARS[b & 0x0f];
         }

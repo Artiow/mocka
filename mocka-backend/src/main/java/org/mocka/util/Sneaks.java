@@ -1,48 +1,28 @@
 package org.mocka.util;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
+@SuppressWarnings({"Convert2Lambda", "Anonymous2MethodRef"})
 public class Sneaks {
 
-    public static <T> Consumer<T> sneakyConsumer(ThrowingConsumer<T> consumer) {
-        return new SneakyConsumer<>(consumer);
-    }
-
     public static Runnable sneakyRunnable(ThrowingRunnable runnable) {
-        return new SneakyRunnable(runnable);
+        return new Runnable() { @Override @SneakyThrows public void run() { runnable.run(); } };
     }
 
     public static <T> Supplier<T> sneakySupplier(ThrowingSupplier<T> supplier) {
-        return new SneakySupplier<>(supplier);
+        return new Supplier<>() { @Override @SneakyThrows public T get() { return supplier.get(); } };
     }
 
-
-    @RequiredArgsConstructor
-    private static class SneakyConsumer<T> implements Consumer<T> {
-
-        private final ThrowingConsumer<T> consumer;
-
-        @Override @SneakyThrows public void accept(T t) { consumer.accept(t); }
+    public static <T> Consumer<T> sneakyConsumer(ThrowingConsumer<T> consumer) {
+        return new Consumer<>() { @Override @SneakyThrows public void accept(T t) { consumer.accept(t); } };
     }
 
-    @RequiredArgsConstructor
-    private static class SneakyRunnable implements Runnable {
-
-        private final ThrowingRunnable runnable;
-
-        @Override @SneakyThrows public void run() { runnable.run(); }
-    }
-
-    @RequiredArgsConstructor
-    private static class SneakySupplier<T> implements Supplier<T> {
-
-        private final ThrowingSupplier<T> supplier;
-
-        @Override @SneakyThrows public T get() { return supplier.get(); }
+    public static <T, R> Function<T, R> sneakyFunction(ThrowingFunction<T, R> function) {
+        return new Function<>() { @Override @SneakyThrows public R apply(T t) { return function.apply(t); } };
     }
 }

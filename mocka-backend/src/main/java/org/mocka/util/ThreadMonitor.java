@@ -2,45 +2,68 @@ package org.mocka.util;
 
 import com.sun.management.ThreadMXBean;
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryUsage;
+import lombok.NonNull;
 
 public class ThreadMonitor {
 
-    private final ThreadMXBean threadMXBean;
-    private final long threadId;
+    private static final ThreadMXBean THREAD_MX_BEAN = getThreadMXBean();
+
+    private final Thread threadToMonitor;
 
 
-    public ThreadMonitor(Thread thread) {
-        this(thread.getId());
-    }
-
-    public ThreadMonitor(long threadId) {
-        this.threadMXBean = getThreadMXBeanForThreadMonitor();
-        this.threadMXBean.setThreadAllocatedMemoryEnabled(true);
-        this.threadMXBean.setThreadCpuTimeEnabled(true);
-        this.threadId = threadId;
+    public ThreadMonitor(@NonNull Thread threadToMonitor) {
+        this.threadToMonitor = threadToMonitor;
     }
 
 
-    private static ThreadMXBean getThreadMXBeanForThreadMonitor() {
+    public static ThreadMonitor forCurrentThread() {
+        return new ThreadMonitor(Thread.currentThread());
+    }
+
+    private static long getThreadAllocatedBytes(long threadId) {
+        return THREAD_MX_BEAN.getThreadAllocatedBytes(threadId);
+    }
+
+    private static long getThreadCpuTime(long threadId) {
+        return THREAD_MX_BEAN.getThreadCpuTime(threadId);
+    }
+
+    private static ThreadMXBean getThreadMXBean() {
         final var jvmThreadMXBean = ManagementFactory.getThreadMXBean();
         if (!(jvmThreadMXBean instanceof ThreadMXBean)) {
-            throw new IllegalArgumentException(Formatter.format(
+            throw new UnsupportedOperationException(Formatter.format(
                 "Cannot initialize ThreadMonitor. {} is not instance of {}",
                 jvmThreadMXBean.getClass().getName(),
                 ThreadMXBean.class.getName()));
         }
-        return (ThreadMXBean) jvmThreadMXBean;
+
+        final var threadMXBean = (ThreadMXBean) jvmThreadMXBean;
+        if (!threadMXBean.isThreadAllocatedMemorySupported()) {
+            throw new UnsupportedOperationException(Formatter.format(
+                "Cannot initialize ThreadMonitor. {} does not support allocated memory measurement",
+                threadMXBean.getClass().getName()));
+        }
+        if (!threadMXBean.isThreadCpuTimeSupported()) {
+            throw new UnsupportedOperationException(Formatter.format(
+                "Cannot initialize ThreadMonitor. {} does not support CPU time measurement",
+                threadMXBean.getClass().getName()));
+        }
+
+        threadMXBean.setThreadAllocatedMemoryEnabled(true);
+        threadMXBean.setThreadCpuTimeEnabled(true);
+        return threadMXBean;
     }
 
 
     public long getThreadAllocatedBytes() {
-        final long threadAllocatedBytes = threadMXBean.getThreadAllocatedBytes(threadId);
+        final long threadAllocatedBytes = getThreadAllocatedBytes(threadToMonitor.getId());
         checkValue(threadAllocatedBytes);
         return threadAllocatedBytes;
     }
 
     public long getThreadCpuTime() {
-        final long threadCpuTime = threadMXBean.getThreadCpuTime(threadId);
+        final long threadCpuTime = getThreadCpuTime(threadToMonitor.getId());
         checkValue(threadCpuTime);
         return threadCpuTime;
     }
@@ -50,7 +73,7 @@ public class ThreadMonitor {
         if (value == -1) {
             throw new IllegalStateException(Formatter.format(
                 "Monitored thread {} is not alive or does not exist",
-                threadId));
+                threadToMonitor.getName()));
         }
     }
 }

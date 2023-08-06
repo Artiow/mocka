@@ -1,3 +1,5 @@
+# server.tomcat.threads.max: 1
+
 spring:
   application.name: mocka-backend
   main.banner-mode: off
